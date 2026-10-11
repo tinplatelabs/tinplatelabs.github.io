@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>robots.txt, sitemap and llms.txt checker API for AI crawlers</title>
+<meta name="description" content="Per site: robots.txt rules and AI-crawler access (GPTBot, ClaudeBot, Google-Extended), every sitemap expanded to a deduplicated URL list, and llms.txt. $0.002 per site.">
+<link rel="canonical" href="https://tinplatelabs.github.io/site-discovery/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="robots.txt, sitemap and llms.txt checker API for AI crawlers">
+<meta property="og:description" content="Per site: robots.txt rules and AI-crawler access (GPTBot, ClaudeBot, Google-Extended), every sitemap expanded to a deduplicated URL list, and llms.txt. $0.002 per site.">
+<meta property="og:url" content="https://tinplatelabs.github.io/site-discovery/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Site Discovery", "description": "Per site: robots.txt rules and AI-crawler access (GPTBot, ClaudeBot, Google-Extended), every sitemap expanded to a deduplicated URL list, and llms.txt. $0.002 per site.", "url": "https://tinplatelabs.github.io/site-discovery/", "sameAs": "https://apify.com/tinplatelabs/site-discovery", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "SEO and crawling", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.002", "priceCurrency": "USD", "description": "per site analyzed", "url": "https://apify.com/tinplatelabs/site-discovery"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does this crawl the website?", "acceptedAnswer": {"@type": "Answer", "text": "No. It fetches only the files sites publish for machines: /robots.txt, sitemaps, /llms.txt and /llms-full.txt. No page is ever crawled."}}, {"@type": "Question", "name": "Which AI crawlers are checked by default?", "acceptedAnswer": {"@type": "Answer", "text": "A list of common AI and search crawlers such as GPTBot, ClaudeBot, Google-Extended and PerplexityBot. Pass userAgents to choose your own product tokens, including *."}}, {"@type": "Question", "name": "What if robots.txt returns a server error?", "acceptedAnswer": {"@type": "Answer", "text": "As RFC 9309 says, a 5xx or unreachable robots.txt means everything is disallowed, and a 4xx means everything is allowed. The robotsTxt.status field tells you which applied."}}, {"@type": "Question", "name": "Can I get only the counts, not the URL list?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. includeUrls: false returns counts only and has no URL fees."}}, {"@type": "Question", "name": "Where does it look for sitemaps?", "acceptedAnswer": {"@type": "Answer", "text": "Sitemaps declared in robots.txt first; otherwise /sitemap.xml, /sitemap_index.xml and /wp-sitemap.xml."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">SEO and crawling · Apify Actor <code>tinplatelabs/site-discovery</code></p>
+<h1>Site Discovery</h1>
+<p class="lede">robots.txt, AI-crawler access, every sitemap URL and llms.txt for any site, as JSON.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/site-discovery">Open Site Discovery in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>To know whether GPTBot or ClaudeBot may read a site, or to get a site's URL inventory without crawling it, you need a correct robots.txt matcher and a sitemap reader that survives what sites actually publish: gzip with the wrong Content-Type, broken namespaces, nested indexes, HTML error pages served with status 200.</p><p>Site Discovery returns one record per site with robots.txt rules per user agent, an allowed/disallowed verdict for each AI and search crawler (with the rule that decided), every sitemap found and expanded into a deduplicated URL list, and the site's llms.txt parsed into sections. A check mode answers "may user agent Y fetch URL X?".</p>
+<ul><li>RFC 9309 robots.txt matching: exact product-token groups, longest match wins, Allow wins ties, wildcards, and the RFC rules for missing (4xx) and broken (5xx) files.</li><li>Sitemaps streamed (no 50 MB file held in memory), indexes expanded recursively, URLs deduplicated; filter by prefix or regex.</li><li>Partial beats failed: one broken sitemap gets its own error entry and the rest of the site is still returned.</li><li>Polite: fetches only robots.txt, sitemaps, llms.txt and llms-full.txt, never pages; requests identify themselves and are paced per host.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;sites&quot;: [
+    &quot;python.org&quot;,
+    &quot;developers.cloudflare.com&quot;
+  ],
+  &quot;userAgents&quot;: [
+    &quot;GPTBot&quot;,
+    &quot;ClaudeBot&quot;,
+    &quot;Google-Extended&quot;,
+    &quot;*&quot;
+  ],
+  &quot;maxUrls&quot;: 5000,
+  &quot;urlPrefixes&quot;: [
+    &quot;/workers/&quot;
+  ]
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;site&quot;: &quot;https://example.com&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;crawlerAccess&quot;: {
+    &quot;GPTBot&quot;: {&quot;allowed&quot;: false, &quot;group&quot;: &quot;GPTBot, CCBot&quot;, &quot;rule&quot;: &quot;Disallow: /&quot;, &quot;reason&quot;: &quot;longest matching rule is &#x27;Disallow: /&#x27;&quot;},
+    &quot;ClaudeBot&quot;: {&quot;allowed&quot;: true, &quot;group&quot;: &quot;*&quot;, &quot;rule&quot;: null, &quot;crawlDelay&quot;: 2.0, &quot;reason&quot;: &quot;no rule matches&quot;}
+  },
+  &quot;sitemaps&quot;: {&quot;source&quot;: &quot;robots.txt&quot;, &quot;count&quot;: 3, &quot;failed&quot;: 1, &quot;complete&quot;: true,
+               &quot;uniqueUrls&quot;: 1180, &quot;duplicateUrls&quot;: 27, &quot;returnedUrls&quot;: 1180},
+  &quot;urls&quot;: [{&quot;loc&quot;: &quot;https://example.com/blog/hello&quot;, &quot;lastmod&quot;: &quot;2026-09-30&quot;}],
+  &quot;llmsTxt&quot;: {&quot;present&quot;: true, &quot;title&quot;: &quot;Example&quot;, &quot;summary&quot;: &quot;Docs for the Example API.&quot;, &quot;linkCount&quot;: 12},
+  &quot;llmsFullTxt&quot;: {&quot;present&quot;: false, &quot;httpStatus&quot;: 404}
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>site-analyzed</code></td><td><strong>$0.002</strong></td><td>Each site analyzed (robots.txt, AI access, sitemaps, llms.txt); in check mode, each site whose robots.txt was read</td></tr><tr><td><code>sitemap-urls-1000</code></td><td><strong>$0.001</strong></td><td>Each started block of 1,000 URLs returned</td></tr></tbody></table>
+<p>An AI-access and llms.txt audit of 100 sites with <code>includeUrls: false</code> costs $0.20. A site with 25,000 sitemap URLs costs $0.027. Sites that don't exist or never answer are not charged. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>1,000 sites (or 10,000 URLs to check) per run; up to 200,000 returned URLs per site.</li><li>Up to 2,000 sitemap files per site, nested up to 6 levels; 100 MB per uncompressed sitemap.</li><li>User-agent groups match by exact product token (RFC 9309); Google's fallback from e.g. Googlebot-Image to Googlebot is not applied.</li><li>llms.txt returned up to 100,000 characters; llms-full.txt is summarized, not returned.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/site-discovery&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;sites&quot;: [&quot;example.com&quot;], &quot;includeUrls&quot;: false}</code> and reads <code>crawlerAccess</code>, <code>llmsTxt</code> and <code>urls</code> from the dataset item.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~site-discovery/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;sites&quot;: [&quot;example.com&quot;], &quot;includeUrls&quot;: false}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Fetches only public machine-readable files (robots.txt, sitemaps, llms.txt) from the sites you name. Results go only to your run's dataset. No LLM, no telemetry. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Does this crawl the website?</summary><p>No. It fetches only the files sites publish for machines: /robots.txt, sitemaps, /llms.txt and /llms-full.txt. No page is ever crawled.</p></details><details><summary>Which AI crawlers are checked by default?</summary><p>A list of common AI and search crawlers such as GPTBot, ClaudeBot, Google-Extended and PerplexityBot. Pass <code>userAgents</code> to choose your own product tokens, including <code>*</code>.</p></details><details><summary>What if robots.txt returns a server error?</summary><p>As RFC 9309 says, a 5xx or unreachable robots.txt means everything is disallowed, and a 4xx means everything is allowed. The <code>robotsTxt.status</code> field tells you which applied.</p></details><details><summary>Can I get only the counts, not the URL list?</summary><p>Yes. <code>includeUrls: false</code> returns counts only and has no URL fees.</p></details><details><summary>Where does it look for sitemaps?</summary><p>Sitemaps declared in robots.txt first; otherwise /sitemap.xml, /sitemap_index.xml and /wp-sitemap.xml.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/site-discovery">Try Site Discovery on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

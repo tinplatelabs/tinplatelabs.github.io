@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF, Word, Excel and PowerPoint to Markdown API for AI agents</title>
+<meta name="description" content="Convert PDF, DOCX, XLSX, PPTX, HTML, CSV and scanned images to clean Markdown or JSON for LLMs and RAG. Tables and headings kept, OCR only where needed. $0.002 per page.">
+<link rel="canonical" href="https://tinplatelabs.github.io/document-to-markdown/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="PDF, Word, Excel and PowerPoint to Markdown API for AI agents">
+<meta property="og:description" content="Convert PDF, DOCX, XLSX, PPTX, HTML, CSV and scanned images to clean Markdown or JSON for LLMs and RAG. Tables and headings kept, OCR only where needed. $0.002 per page.">
+<meta property="og:url" content="https://tinplatelabs.github.io/document-to-markdown/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Document to Markdown", "description": "Convert PDF, DOCX, XLSX, PPTX, HTML, CSV and scanned images to clean Markdown or JSON for LLMs and RAG. Tables and headings kept, OCR only where needed. $0.002 per page.", "url": "https://tinplatelabs.github.io/document-to-markdown/", "sameAs": "https://apify.com/tinplatelabs/document-to-markdown", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Document conversion", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.002", "priceCurrency": "USD", "description": "per page converted", "url": "https://apify.com/tinplatelabs/document-to-markdown"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I convert a file that isn't online?", "acceptedAnswer": {"@type": "Answer", "text": "Upload it to an Apify key-value store, pick that store as keyValueStoreId and pass kvs://KEY as the source. A signed Apify record URL also works."}}, {"@type": "Question", "name": "Are scanned PDFs supported?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. With ocr: auto (the default) only pages without a text layer are OCRed with Tesseract, in any of 26 languages you list in ocrLanguages. Those pages cost $0.006 instead of $0.002."}}, {"@type": "Question", "name": "Does an LLM see my documents?", "acceptedAnswer": {"@type": "Answer", "text": "No. Conversion is deterministic code (pdfplumber, PDFium, markitdown, Tesseract) running inside your Apify run. Nothing is sent to a third party."}}, {"@type": "Question", "name": "How do I split the output for a vector database?", "acceptedAnswer": {"@type": "Answer", "text": "Set chunkByPage: true to get one dataset item per page, or use the pages offsets: markdown[startOffset:endOffset] is exactly that page's text."}}, {"@type": "Question", "name": "What happens with a password-protected or old .doc file?", "acceptedAnswer": {"@type": "Answer", "text": "It returns an error item (ENCRYPTED or LEGACY_OFFICE_FORMAT) that says what to do, costs nothing, and the rest of the run carries on."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Document conversion · Apify Actor <code>tinplatelabs/document-to-markdown</code></p>
+<h1>Document to Markdown</h1>
+<p class="lede">PDF, Office, HTML and scans to clean Markdown or JSON for LLMs, priced per page.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/document-to-markdown">Open Document to Markdown in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>LLMs read Markdown well and PDFs badly. Copy-pasting text out of a PDF loses tables, merges columns and repeats headers; Office files need a different library for every format; scanned pages have no text at all.</p><p>Document to Markdown takes any mix of PDFs, Word, Excel and PowerPoint files, web pages, CSV, text and images and returns Markdown (or typed JSON blocks) with headings, lists and tables intact, plus a page map so an agent can cite or chunk by page. Pages without a text layer go through Tesseract OCR automatically, and only those pay the OCR price.</p>
+<ul><li>Every common format in one call; the format is detected from the file's content, not its name.</li><li>Ruled tables in PDFs, Word tables, Excel sheets and HTML tables come out as Markdown tables (or row arrays in JSON).</li><li>Larger fonts in PDFs become #/##/### headings; bullets become lists.</li><li><code>&lt;!-- page N --&gt;</code> markers and a page map of character offsets, document metadata, warnings and a <code>truncated</code> flag.</li><li>Optional one dataset item per page, ready for embedding.</li><li>No LLMs, no third-party APIs, no telemetry: the same file always gives the same output.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;sources&quot;: [
+    &quot;https://example.com/annual-report.pdf&quot;,
+    &quot;https://example.com/price-list.xlsx&quot;
+  ],
+  &quot;outputFormat&quot;: &quot;markdown&quot;,
+  &quot;ocr&quot;: &quot;auto&quot;,
+  &quot;maxPages&quot;: 100
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;source&quot;: &quot;https://example.com/annual-report.pdf&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;format&quot;: &quot;pdf&quot;,
+  &quot;pageCount&quot;: 2,
+  &quot;pagesConverted&quot;: 2,
+  &quot;ocrPages&quot;: 0,
+  &quot;truncated&quot;: false,
+  &quot;metadata&quot;: {&quot;title&quot;: &quot;Quarterly Report&quot;, &quot;author&quot;: &quot;Finance&quot;},
+  &quot;markdown&quot;: &quot;&lt;!-- page 1 --&gt;\n\n# Quarterly Report\n\nSales grew in every region.\n\n## Revenue by region\n\n| Region | Revenue | Growth |\n|---|---|---|\n| North | 1200 | 4% |\n\n&lt;!-- page 2 --&gt;\n\n...&quot;,
+  &quot;pages&quot;: [
+    {&quot;page&quot;: 1, &quot;ocr&quot;: false, &quot;chars&quot;: 151, &quot;startOffset&quot;: 16, &quot;endOffset&quot;: 167},
+    {&quot;page&quot;: 2, &quot;ocr&quot;: false, &quot;chars&quot;: 47, &quot;startOffset&quot;: 185, &quot;endOffset&quot;: 232}
+  ]
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>page-converted</code></td><td><strong>$0.002</strong></td><td>Each PDF page read from its text layer, each slide, each ~3,000-character section of DOCX, XLSX, HTML, CSV or text</td></tr><tr><td><code>ocr-page</code></td><td><strong>$0.006</strong></td><td>Each scanned page or image frame read with OCR (instead of page-converted)</td></tr></tbody></table>
+<p>A 20-page digital PDF costs $0.04. A 10-page scanned contract costs $0.06. A small 3-sheet workbook costs $0.006. Failed documents and pages over <code>maxPages</code> are never charged. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>50 MB per file, 1,000 sources per run, up to 500 pages, slides or sections per document.</li><li>Downloads time out after 60 s and follow up to 5 redirects; only public addresses are fetched.</li><li>Each document gets 15 minutes; pages done by then are returned with <code>truncated: true</code>.</li><li>Not supported yet: legacy .doc/.xls/.ppt, OpenDocument, EPUB, e-mail files, tables without ruling lines in PDFs, multi-column reading order in PDFs.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/document-to-markdown&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;sources&quot;: [&quot;https://example.com/report.pdf&quot;]}</code> and reads the <code>markdown</code> field of the first dataset item.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~document-to-markdown/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;sources&quot;: [&quot;https://example.com/report.pdf&quot;]}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Files are downloaded into your run, converted there and written only to the run's dataset and key-value store. No third party, no LLM, no telemetry; links inside documents are never followed. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>How do I convert a file that isn&#x27;t online?</summary><p>Upload it to an Apify key-value store, pick that store as <code>keyValueStoreId</code> and pass <code>kvs://KEY</code> as the source. A signed Apify record URL also works.</p></details><details><summary>Are scanned PDFs supported?</summary><p>Yes. With <code>ocr: auto</code> (the default) only pages without a text layer are OCRed with Tesseract, in any of 26 languages you list in <code>ocrLanguages</code>. Those pages cost $0.006 instead of $0.002.</p></details><details><summary>Does an LLM see my documents?</summary><p>No. Conversion is deterministic code (pdfplumber, PDFium, markitdown, Tesseract) running inside your Apify run. Nothing is sent to a third party.</p></details><details><summary>How do I split the output for a vector database?</summary><p>Set <code>chunkByPage: true</code> to get one dataset item per page, or use the <code>pages</code> offsets: <code>markdown[startOffset:endOffset]</code> is exactly that page's text.</p></details><details><summary>What happens with a password-protected or old .doc file?</summary><p>It returns an error item (<code>ENCRYPTED</code> or <code>LEGACY_OFFICE_FORMAT</code>) that says what to do, costs nothing, and the rest of the run carries on.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/document-to-markdown">Try Document to Markdown on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

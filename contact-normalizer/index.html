@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone number, e-mail and country normalizer API (E.164, ISO 3166)</title>
+<meta name="description" content="Validate and normalize phone numbers to E.164, e-mail addresses, names and countries in bulk, offline. Flags disposable and role e-mails, dedupes records. $0.0005 per record.">
+<link rel="canonical" href="https://tinplatelabs.github.io/contact-normalizer/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Phone number, e-mail and country normalizer API (E.164, ISO 3166)">
+<meta property="og:description" content="Validate and normalize phone numbers to E.164, e-mail addresses, names and countries in bulk, offline. Flags disposable and role e-mails, dedupes records. $0.0005 per record.">
+<meta property="og:url" content="https://tinplatelabs.github.io/contact-normalizer/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Contact Normalizer", "description": "Validate and normalize phone numbers to E.164, e-mail addresses, names and countries in bulk, offline. Flags disposable and role e-mails, dedupes records. $0.0005 per record.", "url": "https://tinplatelabs.github.io/contact-normalizer/", "sameAs": "https://apify.com/tinplatelabs/contact-normalizer", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Data cleaning", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.0005", "priceCurrency": "USD", "description": "per record", "url": "https://apify.com/tinplatelabs/contact-normalizer"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does it verify that an e-mail address exists?", "acceptedAnswer": {"@type": "Answer", "text": "No. It validates syntax, flags disposable, role and free-provider addresses, and with checkMx confirms the domain has mail servers. It never probes mailboxes over SMTP."}}, {"@type": "Question", "name": "How are numbers without a country code handled?", "acceptedAnswer": {"@type": "Answer", "text": "They are read in defaultCountry (US by default), or the record's own country column when useRecordCountry is on. Set defaultCountry empty to require a + prefix."}}, {"@type": "Question", "name": "Can it tell mobile from landline?", "acceptedAnswer": {"@type": "Answer", "text": "For most countries, yes, from numbering-plan metadata. US and Canadian numbers can't be told apart offline and come back as fixed_line_or_mobile."}}, {"@type": "Question", "name": "Can I clean the output of another Apify Actor?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Pick its dataset as datasetId; the Actor reads only the dataset you give it."}}, {"@type": "Question", "name": "Is my contact data sent anywhere?", "acceptedAnswer": {"@type": "Answer", "text": "No. Processing happens inside your run. Only the optional MX check sends e-mail domains (never full addresses) to DNS resolvers."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Data cleaning · Apify Actor <code>tinplatelabs/contact-normalizer</code></p>
+<h1>Contact Normalizer</h1>
+<p class="lede">Phones to E.164, e-mails validated, names and countries cleaned, offline, in bulk.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/contact-normalizer">Open Contact Normalizer in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Lead lists, CRM exports and form submissions arrive with phones as <code>(650) 253-0000</code>, <code>+1 650-253-0000</code> and <code>6502530000</code>, e-mails with stray spaces and capitals, and countries as <code>USA</code>, <code>United States</code> or <code>us</code>. Deduplicating or importing that data fails until it is in one shape.</p><p>Contact Normalizer cleans every record in one pass, offline: phones to E.164 with region and line type (Google's libphonenumber metadata), e-mails with RFC syntax validation and disposable, role-account and free-provider flags, names tidied, countries to ISO 3166-1 codes, with optional dedupe by e-mail and/or phone.</p>
+<ul><li>Each item has the untouched <code>original</code>, a drop-in <code>normalized</code> record (same keys, clean values), per-field details and an <code>issues</code> list with codes and plain-English fixes.</li><li>Records inline, from an Apify dataset (e.g. a lead-scraping run) or a CSV/JSON file URL; contact columns detected by name.</li><li>Optional Gmail canonical form (dots and +tags removed) and DNS MX check.</li><li>Deterministic: the same input always gives the same output.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;records&quot;: [
+    {
+      &quot;name&quot;: &quot;ada LOVELACE&quot;,
+      &quot;email&quot;: &quot; Ada.Lovelace@EXAMPLE.com &quot;,
+      &quot;phone&quot;: &quot;(650) 253-0000&quot;,
+      &quot;country&quot;: &quot;USA&quot;
+    },
+    {
+      &quot;name&quot;: &quot;grace hopper&quot;,
+      &quot;email&quot;: &quot;info@mailinator.com&quot;,
+      &quot;phone&quot;: &quot;+1 555 12&quot;,
+      &quot;country&quot;: &quot;Atlantis&quot;
+    }
+  ],
+  &quot;defaultCountry&quot;: &quot;US&quot;,
+  &quot;dedupe&quot;: &quot;emailOrPhone&quot;
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;index&quot;: 0,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;valid&quot;: true,
+  &quot;normalized&quot;: {&quot;name&quot;: &quot;Ada Lovelace&quot;, &quot;email&quot;: &quot;ada.lovelace@example.com&quot;, &quot;phone&quot;: &quot;+16502530000&quot;, &quot;country&quot;: &quot;US&quot;},
+  &quot;fields&quot;: {
+    &quot;phone&quot;: {&quot;valid&quot;: true, &quot;e164&quot;: &quot;+16502530000&quot;, &quot;national&quot;: &quot;(650) 253-0000&quot;,
+              &quot;international&quot;: &quot;+1 650-253-0000&quot;, &quot;region&quot;: &quot;US&quot;, &quot;type&quot;: &quot;fixed_line_or_mobile&quot;},
+    &quot;email&quot;: {&quot;valid&quot;: true, &quot;domain&quot;: &quot;example.com&quot;, &quot;disposable&quot;: false, &quot;role&quot;: false, &quot;freeProvider&quot;: false}
+  },
+  &quot;issues&quot;: [],
+  &quot;isDuplicate&quot;: false
+}
+
+// second record: &quot;valid&quot;: false, with issues such as
+{&quot;field&quot;: &quot;phone&quot;, &quot;code&quot;: &quot;PHONE_INVALID&quot;, &quot;severity&quot;: &quot;error&quot;,
+ &quot;message&quot;: &quot;&#x27;+1 555 12&#x27; is not a valid number for country code +1 (wrong length or unassigned range). Check the digits and the country.&quot;}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>record-normalized</code></td><td><strong>$0.0005</strong></td><td>Each record processed, including records with validation issues</td></tr></tbody></table>
+<p>10,000 records cost $5. Error items (a record that isn't an object or has no contact fields) and dropped duplicates are free. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>Up to 1,000,000 records per run; <code>dataUrl</code> files up to 20 MB (use an Apify dataset for more).</li><li>Phone line type comes from numbering-plan metadata, not a live carrier lookup: no carrier name or reachability.</li><li>E-mail checks are syntax plus lists; <code>checkMx</code> confirms the domain accepts mail but never contacts a mailbox.</li><li>Names are tidied, not split or gender-guessed.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/contact-normalizer&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;records&quot;: [{&quot;name&quot;: &quot;ada lovelace&quot;, &quot;email&quot;: &quot;Ada@Example.com&quot;, &quot;phone&quot;: &quot;650 253 0000&quot;}]}</code> and reads <code>normalized</code> for clean values and <code>issues</code> for what to fix.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~contact-normalizer/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;records&quot;: [{&quot;name&quot;: &quot;ada lovelace&quot;, &quot;email&quot;: &quot;Ada@Example.com&quot;, &quot;phone&quot;: &quot;650 253 0000&quot;}]}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Records are processed inside your run and stored only in its dataset and key-value store. No third party, no LLM. The optional MX check sends e-mail domains, never full addresses, to DNS resolvers. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Does it verify that an e-mail address exists?</summary><p>No. It validates syntax, flags disposable, role and free-provider addresses, and with <code>checkMx</code> confirms the domain has mail servers. It never probes mailboxes over SMTP.</p></details><details><summary>How are numbers without a country code handled?</summary><p>They are read in <code>defaultCountry</code> (US by default), or the record's own country column when <code>useRecordCountry</code> is on. Set <code>defaultCountry</code> empty to require a + prefix.</p></details><details><summary>Can it tell mobile from landline?</summary><p>For most countries, yes, from numbering-plan metadata. US and Canadian numbers can't be told apart offline and come back as <code>fixed_line_or_mobile</code>.</p></details><details><summary>Can I clean the output of another Apify Actor?</summary><p>Yes. Pick its dataset as <code>datasetId</code>; the Actor reads only the dataset you give it.</p></details><details><summary>Is my contact data sent anywhere?</summary><p>No. Processing happens inside your run. Only the optional MX check sends e-mail domains (never full addresses) to DNS resolvers.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/contact-normalizer">Try Contact Normalizer on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

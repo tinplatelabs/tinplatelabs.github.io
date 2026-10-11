@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP request tool for AI agents: JSON, Markdown, retries, SSRF-safe</title>
+<meta name="description" content="Batch HTTP requests for AI agents: parsed JSON, HTML as Markdown of the main content, redirect chain, timing, TLS details, retries and SSRF protection. $0.001 per request.">
+<link rel="canonical" href="https://tinplatelabs.github.io/agent-http/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="HTTP request tool for AI agents: JSON, Markdown, retries, SSRF-safe">
+<meta property="og:description" content="Batch HTTP requests for AI agents: parsed JSON, HTML as Markdown of the main content, redirect chain, timing, TLS details, retries and SSRF protection. $0.001 per request.">
+<meta property="og:url" content="https://tinplatelabs.github.io/agent-http/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "HTTP Request Tool for Agents", "description": "Batch HTTP requests for AI agents: parsed JSON, HTML as Markdown of the main content, redirect chain, timing, TLS details, retries and SSRF protection. $0.001 per request.", "url": "https://tinplatelabs.github.io/agent-http/", "sameAs": "https://apify.com/tinplatelabs/agent-http", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "HTTP and APIs", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.001", "priceCurrency": "USD", "description": "per request completed", "url": "https://apify.com/tinplatelabs/agent-http"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this a web scraper?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is a plain HTTP client: no proxy rotation, no fingerprint spoofing, no CAPTCHA or anti-bot evasion, and the default User-Agent identifies the Actor. You are responsible for the terms of the sites and APIs you call."}}, {"@type": "Question", "name": "How do I pass an API key safely?", "acceptedAnswer": {"@type": "Answer", "text": "Use the authorization input (stored encrypted, never output) or per-request headers. Authorization, cookie and API-key headers and query parameters are redacted in the dataset and log."}}, {"@type": "Question", "name": "What does an agent get for an HTML page?", "acceptedAnswer": {"@type": "Answer", "text": "Markdown of the main content, with navigation, cookie banners, sidebars and footers stripped and links made absolute, cut to the token budget. Use htmlFormat for full-page Markdown, text or raw HTML."}}, {"@type": "Question", "name": "Can it check a list of links for broken ones?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. mode: url-health returns broken, the reason (e.g. HTTP 404, DNS_FAILED), redirect count, response time and TLS days left, without downloading bodies."}}, {"@type": "Question", "name": "Why are 404 responses charged?", "acceptedAnswer": {"@type": "Answer", "text": "A 404 is a successful HTTP exchange with an answer you can act on. Only requests that get no response at all are free."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">HTTP and APIs · Apify Actor <code>tinplatelabs/agent-http</code></p>
+<h1>HTTP Request Tool for Agents</h1>
+<p class="lede">Agent-ready HTTP client: parsed JSON, page Markdown, retries, token budget, SSRF-safe.</p>
+<p class="note">The Apify Store listing for this Actor is being published in October 2026. If the Store link below doesn't open yet, check back in a day or two.</p><p><a class="cta" href="https://apify.com/tinplatelabs/agent-http">Open HTTP Request Tool for Agents in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Agents that call APIs or read web pages get raw HTML full of navigation and cookie banners, multi-megabyte bodies that flood the context window, and no help with retries, redirects or rate limits.</p><p>HTTP Request Tool for Agents sends a batch of requests and returns one clean record per request: status, headers, the body as parsed JSON or as Markdown of the page's main content, the full redirect chain, a timing breakdown and TLS certificate details. A token budget cuts long bodies at a paragraph boundary and says so. A URL health mode checks lists of links.</p>
+<ul><li><code>maxBodyTokens</code> (default 8,000) keeps one huge page from flooding the context.</li><li>Retries on 429/5xx and connection failures with backoff, honouring Retry-After; POST/PATCH only retried when safe.</li><li>Private, loopback, link-local and cloud-metadata addresses refused, also after redirects and DNS resolution.</li><li>Authorization, cookies and API-key headers redacted in output and log; credentials not forwarded to another host on redirect.</li><li>Binary bodies saved to the key-value store and returned as a URL.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;requests&quot;: [
+    {
+      &quot;method&quot;: &quot;GET&quot;,
+      &quot;url&quot;: &quot;https://httpbin.org/json&quot;
+    },
+    {
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;url&quot;: &quot;https://api.example.com/v1/search&quot;,
+      &quot;json&quot;: {
+        &quot;q&quot;: &quot;widgets&quot;
+      },
+      &quot;label&quot;: &quot;search&quot;
+    },
+    &quot;https://example.com&quot;
+  ],
+  &quot;maxBodyTokens&quot;: 4000
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;index&quot;: 0, &quot;label&quot;: &quot;docs&quot;, &quot;method&quot;: &quot;GET&quot;, &quot;url&quot;: &quot;https://example.com/docs&quot;,
+  &quot;status&quot;: &quot;ok&quot;, &quot;statusCode&quot;: 200, &quot;ok&quot;: true,
+  &quot;finalUrl&quot;: &quot;https://www.example.com/docs/&quot;,
+  &quot;redirects&quot;: [{&quot;url&quot;: &quot;https://example.com/docs&quot;, &quot;statusCode&quot;: 301, &quot;location&quot;: &quot;https://www.example.com/docs/&quot;}],
+  &quot;contentType&quot;: &quot;text/html; charset=utf-8&quot;,
+  &quot;bodyFormat&quot;: &quot;markdown&quot;,
+  &quot;body&quot;: &quot;# Getting started\n\nInstall the CLI ...&quot;,
+  &quot;truncated&quot;: false, &quot;bodyChars&quot;: 5120, &quot;bodyTokensEstimate&quot;: 1280,
+  &quot;page&quot;: {&quot;title&quot;: &quot;Getting started&quot;, &quot;language&quot;: &quot;en&quot;},
+  &quot;timingMs&quot;: {&quot;dns&quot;: 12, &quot;connect&quot;: 9, &quot;tls&quot;: 21, &quot;waiting&quot;: 88, &quot;download&quot;: 4, &quot;total&quot;: 140},
+  &quot;tls&quot;: {&quot;protocol&quot;: &quot;TLSv1.3&quot;, &quot;issuer&quot;: &quot;Let&#x27;s Encrypt&quot;, &quot;daysLeft&quot;: 51}
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>request-completed</code></td><td><strong>$0.001</strong></td><td>Each request that received an HTTP response, any status code (retries and redirects included)</td></tr></tbody></table>
+<p>1,000 requests cost $1. A 404 or 500 is a response and is charged; DNS failures, timeouts, blocked addresses and invalid input cost nothing. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>10,000 requests per run; HTTP/1.1 only.</li><li>JavaScript is not executed: pages rendered in the browser come back nearly empty.</li><li>HTML larger than 2 MB is converted from its first 2 MB; downloads up to 50 MB per body (10 MB default).</li><li>Only public internet addresses are reachable.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/agent-http&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;requests&quot;: [{&quot;url&quot;: &quot;https://example.com&quot;}]}</code> and reads <code>statusCode</code>, <code>bodyFormat</code> and <code>body</code> from the dataset items.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~agent-http/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;requests&quot;: [{&quot;url&quot;: &quot;https://example.com&quot;}]}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Requests go only to the URLs you give (and their redirects). Secrets in headers are redacted in the dataset and log. No third party, no LLM, no telemetry. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Is this a web scraper?</summary><p>No. It is a plain HTTP client: no proxy rotation, no fingerprint spoofing, no CAPTCHA or anti-bot evasion, and the default User-Agent identifies the Actor. You are responsible for the terms of the sites and APIs you call.</p></details><details><summary>How do I pass an API key safely?</summary><p>Use the <code>authorization</code> input (stored encrypted, never output) or per-request headers. Authorization, cookie and API-key headers and query parameters are redacted in the dataset and log.</p></details><details><summary>What does an agent get for an HTML page?</summary><p>Markdown of the main content, with navigation, cookie banners, sidebars and footers stripped and links made absolute, cut to the token budget. Use <code>htmlFormat</code> for full-page Markdown, text or raw HTML.</p></details><details><summary>Can it check a list of links for broken ones?</summary><p>Yes. <code>mode: url-health</code> returns <code>broken</code>, the reason (e.g. HTTP 404, DNS_FAILED), redirect count, response time and TLS days left, without downloading bodies.</p></details><details><summary>Why are 404 responses charged?</summary><p>A 404 is a successful HTTP exchange with an answer you can act on. Only requests that get no response at all are free.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/agent-http">Try HTTP Request Tool for Agents on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

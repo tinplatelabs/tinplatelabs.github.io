@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traefik Labels plugin for JetBrains IDEs: completion and validation</title>
+<meta name="description" content="JetBrains IDE plugin for Traefik Docker labels in Compose files: completion, unknown-label warnings with quick-fixes and hover docs, generated from Traefik&#x27;s label reference. Free.">
+<link rel="canonical" href="https://tinplatelabs.github.io/traefik-labels/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Traefik Labels plugin for JetBrains IDEs: completion and validation">
+<meta property="og:description" content="JetBrains IDE plugin for Traefik Docker labels in Compose files: completion, unknown-label warnings with quick-fixes and hover docs, generated from Traefik&#x27;s label reference. Free.">
+<meta property="og:url" content="https://tinplatelabs.github.io/traefik-labels/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Traefik Labels", "description": "JetBrains IDE plugin for Traefik Docker labels in Compose files: completion, unknown-label warnings with quick-fixes and hover docs, generated from Traefik's label reference. Free.", "url": "https://tinplatelabs.github.io/traefik-labels/", "sameAs": "https://plugins.jetbrains.com/plugin/34986-traefik-labels", "applicationCategory": "DeveloperApplication", "operatingSystem": "JetBrains IDEs 2025.3+", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which IDEs does it work in?", "acceptedAnswer": {"@type": "Answer", "text": "Every JetBrains IDE with the bundled YAML plugin, version 2025.3 or newer: IntelliJ IDEA, PyCharm, GoLand, WebStorm, PhpStorm, Rider, RubyMine, CLion and the rest."}}, {"@type": "Question", "name": "Does it need a network connection or send telemetry?", "acceptedAnswer": {"@type": "Answer", "text": "No. The label schema ships inside the plugin, and it never makes network requests."}}, {"@type": "Question", "name": "Where does the label list come from?", "acceptedAnswer": {"@type": "Answer", "text": "It is generated from Traefik's own label reference for a specific Traefik release, never written by hand, so labels and their documentation match Traefik."}}, {"@type": "Question", "name": "Does it understand labels in list form and under deploy?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Labels in map form and list form, under labels and deploy.labels, are supported."}}, {"@type": "Question", "name": "Why isn't a value with ${VAR} flagged?", "acceptedAnswer": {"@type": "Answer", "text": "Compose interpolates ${...} before Traefik reads the label, so the plugin never reports a problem on such a value."}}, {"@type": "Question", "name": "Is it free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, version 1.0.0 is free. A paid Pro tier (value, rule and reference validation) may follow; JetBrains Marketplace would handle its billing, trials and refunds."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">JetBrains IDE plugin · Docker Compose</p>
+<h1>Traefik Labels</h1>
+<p class="lede">Completion, warnings and docs for Traefik Docker labels in Compose files, in any JetBrains IDE.</p>
+<p class="note">Coming soon: version 1.0.0 is in JetBrains Marketplace review. Until it is approved, the Marketplace page and the IDE's plugin search may not show it yet.</p><p><a class="cta" href="https://plugins.jetbrains.com/plugin/34986-traefik-labels">Traefik Labels on JetBrains Marketplace</a></p>
+<h2>What it solves</h2>
+<p>Traefik is configured on Docker through long, dotted labels such as <code>traefik.http.routers.api.middlewares</code>. A typo in one of them is silently ignored by Traefik, and the right segment names live in a reference page you have to keep open.</p>
+<p>Traefik Labels makes the IDE understand those labels in Compose files:</p>
+<ul>
+<li>Completion for every <code>traefik.*</code> label segment, for router, service and middleware names defined in the file, and for values.</li>
+<li>Warnings for unknown and incomplete labels, with did-you-mean quick-fixes.</li>
+<li>Hover documentation with a link to the matching Traefik reference page.</li>
+</ul>
+<h2>Example</h2>
+<pre><code class="language-yaml">services:
+  whoami:
+    image: traefik/whoami
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.whoami.rule=Host(`whoami.example.com`)
+      - traefik.http.routers.whoami.entrypoints=websecure
+      - traefik.http.routers.whoami.tls.certresolver=le
+      - traefik.http.services.whoami.loadbalancer.server.prot=80   # warning: unknown label, did you mean ...server.port?</code></pre>
+<p>Typing <code>traefik.http.routers.whoami.</code> offers <code>rule</code>, <code>entrypoints</code>, <code>tls</code>, <code>middlewares</code> and the other router options; the misspelt <code>prot</code> is underlined with a quick-fix to <code>port</code>.</p>
+<h2>Install</h2>
+<p>In the IDE: <strong>Settings → Plugins → Marketplace</strong>, search for <strong>Traefik Labels</strong>, install and restart. Or install from the <a href="https://plugins.jetbrains.com/plugin/34986-traefik-labels">Marketplace page</a>.</p>
+<h2>Pricing</h2>
+<p>Free. Licensed under the <a href="https://tinplatelabs.github.io/legal/EULA">Tinplate Labs EULA</a>.</p>
+<h2>Privacy</h2>
+<p>The plugin runs entirely inside your IDE with no network access and no telemetry.</p>
+<h2>FAQ</h2>
+<details><summary>Which IDEs does it work in?</summary><p>Every JetBrains IDE with the bundled YAML plugin, version 2025.3 or newer: IntelliJ IDEA, PyCharm, GoLand, WebStorm, PhpStorm, Rider, RubyMine, CLion and the rest.</p></details><details><summary>Does it need a network connection or send telemetry?</summary><p>No. The label schema ships inside the plugin, and it never makes network requests.</p></details><details><summary>Where does the label list come from?</summary><p>It is generated from Traefik's own label reference for a specific Traefik release, never written by hand, so labels and their documentation match Traefik.</p></details><details><summary>Does it understand labels in list form and under deploy?</summary><p>Yes. Labels in map form and list form, under <code>labels</code> and <code>deploy.labels</code>, are supported.</p></details><details><summary>Why isn&#x27;t a value with ${VAR} flagged?</summary><p>Compose interpolates <code>${...}</code> before Traefik reads the label, so the plugin never reports a problem on such a value.</p></details><details><summary>Is it free?</summary><p>Yes, version 1.0.0 is free. A paid Pro tier (value, rule and reference validation) may follow; JetBrains Marketplace would handle its billing, trials and refunds.</p></details>
+<p class="meta">Not affiliated with Traefik Labs. Traefik is a trademark of Traefik Labs.</p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

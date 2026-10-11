@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real-ESRGAN image upscaler API: 2x, 3x, 4x in batch</title>
+<meta name="description" content="Upscale images 2x, 3x or 4x with Real-ESRGAN, sharpening edges and removing JPEG artifacts without inventing content. Batch URLs, PNG/JPEG/WebP out. From $0.012 per image.">
+<link rel="canonical" href="https://tinplatelabs.github.io/image-upscaler/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Real-ESRGAN image upscaler API: 2x, 3x, 4x in batch">
+<meta property="og:description" content="Upscale images 2x, 3x or 4x with Real-ESRGAN, sharpening edges and removing JPEG artifacts without inventing content. Batch URLs, PNG/JPEG/WebP out. From $0.012 per image.">
+<meta property="og:url" content="https://tinplatelabs.github.io/image-upscaler/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Image Upscaler", "description": "Upscale images 2x, 3x or 4x with Real-ESRGAN, sharpening edges and removing JPEG artifacts without inventing content. Batch URLs, PNG/JPEG/WebP out. From $0.012 per image.", "url": "https://tinplatelabs.github.io/image-upscaler/", "sameAs": "https://apify.com/tinplatelabs/image-upscaler", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Image processing", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.012", "priceCurrency": "USD", "description": "per image up to 1 megapixel", "url": "https://apify.com/tinplatelabs/image-upscaler"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Will it change faces or text in my image?", "acceptedAnswer": {"@type": "Answer", "text": "No. Real-ESRGAN sharpens what is there; it has a small field of view and doesn't imagine new faces, words or objects the way diffusion upscalers can. A blurry input stays honest about it."}}, {"@type": "Question", "name": "Which upscale factor should I use?", "acceptedAnswer": {"@type": "Answer", "text": "4x for small images and thumbnails. For inputs larger than about 1250x1250 px use 3x or 2x so the output stays within 25 megapixels; the error message tells you which scale fits."}}, {"@type": "Question", "name": "Can I keep transparency?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Transparent images keep their alpha channel and come out as PNG (or WebP if you ask for it)."}}, {"@type": "Question", "name": "Where are the upscaled files?", "acceptedAnswer": {"@type": "Answer", "text": "In the run's key-value store. Each dataset item has a signed outputUrl that works for anyone you share it with."}}, {"@type": "Question", "name": "Does it cost more at 4x than 2x?", "acceptedAnswer": {"@type": "Answer", "text": "No. You pay by the size of the input image; the scale doesn't change the price."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Image processing · Apify Actor <code>tinplatelabs/image-upscaler</code></p>
+<h1>Image Upscaler</h1>
+<p class="lede">Real-ESRGAN 2x to 4x upscaling in batch, faithful to the original, no diffusion.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/image-upscaler">Open Image Upscaler in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Ordinary resizing makes small product photos, thumbnails and old web images soft and blocky. Diffusion upscalers look sharp but redraw faces, text and objects that were never there.</p><p>Image Upscaler uses Real-ESRGAN (<code>realesr-general-x4v3</code>), a compact restoration network that sharpens edges and removes blur, noise and JPEG artifacts without inventing new content. Send a batch of URLs or key-value store files and get upscaled PNG, JPEG or WebP files with one result row per image.</p>
+<ul><li>Scale 2x, 3x or 4x; up to 500 images per run; one bad image never stops the run.</li><li>Tunable <code>denoiseStrength</code> from 0 (keep grain) to 100 (clean and smooth).</li><li>Transparency, grayscale, EXIF rotation and ICC color profile preserved; EXIF metadata (camera, GPS) removed from the output.</li><li>Price depends on the size of the image you send, not the scale.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;images&quot;: [
+    &quot;https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg&quot;
+  ],
+  &quot;scale&quot;: 4,
+  &quot;outputFormat&quot;: &quot;webp&quot;,
+  &quot;quality&quot;: 90,
+  &quot;denoiseStrength&quot;: 50
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;source&quot;: &quot;https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;outputUrl&quot;: &quot;https://api.apify.com/v2/key-value-stores/&lt;storeId&gt;/records/0001-Example-upscaled.jpg?signature=...&quot;,
+  &quot;format&quot;: &quot;jpeg&quot;,
+  &quot;sizeBytes&quot;: 68109,
+  &quot;scale&quot;: 4,
+  &quot;input&quot;: {&quot;width&quot;: 172, &quot;height&quot;: 178, &quot;megapixels&quot;: 0.031},
+  &quot;output&quot;: {&quot;width&quot;: 688, &quot;height&quot;: 712, &quot;megapixels&quot;: 0.49},
+  &quot;chargedEvent&quot;: &quot;image-upscaled&quot;,
+  &quot;timingMs&quot;: {&quot;download&quot;: 44, &quot;upscale&quot;: 716, &quot;encode&quot;: 4, &quot;total&quot;: 1010}
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>image-upscaled</code></td><td><strong>$0.012</strong></td><td>Input up to 1 megapixel (e.g. 1000x1000 px or smaller)</td></tr><tr><td><code>image-upscaled-large</code></td><td><strong>$0.035</strong></td><td>Input of 1 to 3 megapixels (e.g. 2000x1500 px)</td></tr><tr><td><code>image-upscaled-xl</code></td><td><strong>$0.07</strong></td><td>Input over 3 megapixels (up to 6.25 MP, at 2x)</td></tr></tbody></table>
+<p>100 product photos of 800x800 px at 4x cost $1.20. A 1920x1080 screenshot at 2x costs $0.035. Platform usage is included; failed images are never charged. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>Input 8 to 4096 px per side, 30 MB per file, up to 500 images per run.</li><li>Output at most 25 megapixels (4x: inputs up to about 1250x1250 px; 2x: about 2500x2500 px).</li><li>Animated GIF/WebP and multi-page TIFF: first frame only.</li><li>No face restoration, no video, no more than 4x in one run (run the output again for 8x).</li><li>Runs on CPU: about 7 s per input megapixel at the default 16 GB.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/image-upscaler&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;images&quot;: [&quot;https://example.com/photo.jpg&quot;], &quot;scale&quot;: 4}</code> and reads <code>outputUrl</code> from the first dataset item.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~image-upscaler/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;images&quot;: [&quot;https://example.com/photo.jpg&quot;], &quot;scale&quot;: 4}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Images are processed inside your run and written only to its key-value store and dataset. No third party, no telemetry; EXIF metadata such as GPS is stripped from the output. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Will it change faces or text in my image?</summary><p>No. Real-ESRGAN sharpens what is there; it has a small field of view and doesn't imagine new faces, words or objects the way diffusion upscalers can. A blurry input stays honest about it.</p></details><details><summary>Which upscale factor should I use?</summary><p>4x for small images and thumbnails. For inputs larger than about 1250x1250 px use 3x or 2x so the output stays within 25 megapixels; the error message tells you which scale fits.</p></details><details><summary>Can I keep transparency?</summary><p>Yes. Transparent images keep their alpha channel and come out as PNG (or WebP if you ask for it).</p></details><details><summary>Where are the upscaled files?</summary><p>In the run's key-value store. Each dataset item has a signed <code>outputUrl</code> that works for anyone you share it with.</p></details><details><summary>Does it cost more at 4x than 2x?</summary><p>No. You pay by the size of the input image; the scale doesn't change the price.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/image-upscaler">Try Image Upscaler on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

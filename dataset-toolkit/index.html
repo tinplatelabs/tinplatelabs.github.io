@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merge, dedupe, filter and convert datasets: CSV, Excel, JSON, Parquet</title>
+<meta name="description" content="Merge Apify datasets and CSV, JSON, Excel or Parquet files, remove duplicates (exact or fuzzy), filter, sort and export to CSV, XLSX, JSON or Parquet. $0.002 per 1,000 rows.">
+<link rel="canonical" href="https://tinplatelabs.github.io/dataset-toolkit/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Merge, dedupe, filter and convert datasets: CSV, Excel, JSON, Parquet">
+<meta property="og:description" content="Merge Apify datasets and CSV, JSON, Excel or Parquet files, remove duplicates (exact or fuzzy), filter, sort and export to CSV, XLSX, JSON or Parquet. $0.002 per 1,000 rows.">
+<meta property="og:url" content="https://tinplatelabs.github.io/dataset-toolkit/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Dataset Toolkit", "description": "Merge Apify datasets and CSV, JSON, Excel or Parquet files, remove duplicates (exact or fuzzy), filter, sort and export to CSV, XLSX, JSON or Parquet. $0.002 per 1,000 rows.", "url": "https://tinplatelabs.github.io/dataset-toolkit/", "sameAs": "https://apify.com/tinplatelabs/dataset-toolkit", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Data cleaning", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.002", "priceCurrency": "USD", "description": "per 1,000 rows processed", "url": "https://apify.com/tinplatelabs/dataset-toolkit"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does fuzzy dedupe work?", "acceptedAnswer": {"@type": "Answer", "text": "Values are normalized and compared with RapidFuzz token sort ratio; a row joins the first earlier group scoring at least fuzzyThreshold (default 90). It catches typos, punctuation and word order. A typo in the very first letter is not caught."}}, {"@type": "Question", "name": "Can I convert a CSV to Excel or Parquet without other changes?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Give the file in fileUrls and the formats in exportFormats; the cost is $0.002 per started 1,000 rows plus $0.005 per file."}}, {"@type": "Question", "name": "Can an agent get just the result links?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Set datasetOutput: \"summary\" to get one item with counts and download links instead of every row."}}, {"@type": "Question", "name": "What happens if one input fails?", "acceptedAnswer": {"@type": "Answer", "text": "It gets an error with a code and fix in the summary, and the other inputs are still processed. The run fails only if every input failed or the input is invalid."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Data cleaning · Apify Actor <code>tinplatelabs/dataset-toolkit</code></p>
+<h1>Dataset Toolkit</h1>
+<p class="lede">Merge, dedupe (even fuzzy), filter and export scraped data to CSV, Excel or Parquet.</p>
+<p class="note">The Apify Store listing for this Actor is being published in October 2026. If the Store link below doesn't open yet, check back in a day or two.</p><p><a class="cta" href="https://apify.com/tinplatelabs/dataset-toolkit">Open Dataset Toolkit in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Scraped data rarely arrives in one clean file. It comes from several runs and formats, with duplicates that differ only in case, spacing or a typo, and needs filtering and a particular export format before anyone can use it.</p><p>Dataset Toolkit reads Apify datasets and CSV, TSV, JSON, JSON Lines, Excel and Parquet files, merges them, flattens nested JSON, filters with a simple rule language, removes duplicates (exact, normalized or fuzzy), sorts, selects and renames columns, and exports to CSV, XLSX, JSON, JSONL or Parquet with download links. Rows are staged on disk, so a million rows don't run out of memory.</p>
+<ul><li>Filter without code: <code>price &gt;= 10 and country in ["CA", "US"] and not email empty</code>, parsed safely, never executed.</li><li>Fuzzy dedupe with RapidFuzz: <code>Acme Corporation Ltd</code> matches <code>ACME Corporaton Ltd.</code>; keep the first, last or most complete row.</li><li>Every input read independently: a broken file gets an error in the summary while everything else is processed.</li><li>Measured: 1,000,000 rows with dedupe, sort and three exports in about 70 s.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;datasetIds&quot;: [
+    &quot;aBcDeFgHiJkLmNoPq&quot;
+  ],
+  &quot;fileUrls&quot;: [
+    &quot;https://example.com/leads.csv&quot;
+  ],
+  &quot;filter&quot;: &quot;country in [\&quot;CA\&quot;, \&quot;US\&quot;] and not email empty&quot;,
+  &quot;dedupe&quot;: &quot;normalized&quot;,
+  &quot;dedupeFields&quot;: [
+    &quot;email&quot;
+  ],
+  &quot;keep&quot;: &quot;most-complete&quot;,
+  &quot;sortBy&quot;: [
+    &quot;-rating&quot;,
+    &quot;name&quot;
+  ],
+  &quot;exportFormats&quot;: [
+    &quot;csv&quot;,
+    &quot;xlsx&quot;
+  ]
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">// key-value store record SUMMARY
+{
+  &quot;rowsRead&quot;: 12000, &quot;rowsFiltered&quot;: 1500, &quot;duplicatesRemoved&quot;: 830, &quot;rowsOut&quot;: 9670,
+  &quot;sources&quot;: [
+    {&quot;source&quot;: &quot;dataset:aBcDeFgHiJkLmNoPq&quot;, &quot;kind&quot;: &quot;dataset&quot;, &quot;status&quot;: &quot;ok&quot;, &quot;rowsRead&quot;: 10000},
+    {&quot;source&quot;: &quot;https://example.com/leads.csv&quot;, &quot;kind&quot;: &quot;url&quot;, &quot;status&quot;: &quot;error&quot;, &quot;rowsRead&quot;: 0,
+     &quot;error&quot;: {&quot;code&quot;: &quot;HTTP_ERROR&quot;, &quot;message&quot;: &quot;The server answered HTTP 403 ...&quot;}}
+  ],
+  &quot;exports&quot;: [{&quot;format&quot;: &quot;csv&quot;, &quot;key&quot;: &quot;output.csv&quot;, &quot;status&quot;: &quot;ok&quot;, &quot;rows&quot;: 9670,
+               &quot;url&quot;: &quot;https://api.apify.com/v2/key-value-stores/.../records/output.csv&quot;}],
+  &quot;charged&quot;: {&quot;rows-processed-1000&quot;: 12, &quot;file-exported&quot;: 1}
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>rows-processed-1000</code></td><td><strong>$0.002</strong></td><td>Each started block of 1,000 input rows read (rows later filtered or removed as duplicates count)</td></tr><tr><td><code>file-exported</code></td><td><strong>$0.005</strong></td><td>Each export file written</td></tr></tbody></table>
+<p>Dedupe 50,000 rows from two datasets and export a CSV and an XLSX: 50 x $0.002 + 2 x $0.005 = $0.11. Inputs that fail to load and failed exports are not charged. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>Row count limited by disk, not memory; give multi-million-row runs 2 to 4 GB.</li><li>Files up to 1 GB each; JSON files whose top level is an object are limited to 100 MB.</li><li>XLSX holds at most 1,048,575 rows; only the first sheet of a workbook is read; old .xls is not supported.</li><li>At most 100 inputs per run; file URLs must be public.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/dataset-toolkit&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;items&quot;: [{&quot;email&quot;: &quot;Ann@X.com &quot;}, {&quot;email&quot;: &quot;ann@x.com&quot;}], &quot;dedupe&quot;: &quot;normalized&quot;, &quot;datasetOutput&quot;: &quot;summary&quot;}</code> and reads the summary item's counts and export links.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~dataset-toolkit/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;items&quot;: [{&quot;email&quot;: &quot;Ann@X.com &quot;}, {&quot;email&quot;: &quot;ann@x.com&quot;}], &quot;dedupe&quot;: &quot;normalized&quot;, &quot;datasetOutput&quot;: &quot;summary&quot;}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Data is processed only inside your run and stored only in your run's storages. No third party, no LLM. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>How does fuzzy dedupe work?</summary><p>Values are normalized and compared with RapidFuzz token sort ratio; a row joins the first earlier group scoring at least <code>fuzzyThreshold</code> (default 90). It catches typos, punctuation and word order. A typo in the very first letter is not caught.</p></details><details><summary>Can I convert a CSV to Excel or Parquet without other changes?</summary><p>Yes. Give the file in <code>fileUrls</code> and the formats in <code>exportFormats</code>; the cost is $0.002 per started 1,000 rows plus $0.005 per file.</p></details><details><summary>Can an agent get just the result links?</summary><p>Yes. Set <code>datasetOutput: "summary"</code> to get one item with counts and download links instead of every row.</p></details><details><summary>What happens if one input fails?</summary><p>It gets an error with a code and fix in the summary, and the other inputs are still processed. The run fails only if every input failed or the input is invalid.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/dataset-toolkit">Try Dataset Toolkit on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

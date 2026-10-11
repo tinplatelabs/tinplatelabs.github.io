@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image OCR API for AI agents: text, Markdown and bounding boxes</title>
+<meta name="description" content="Extract text from screenshots, scans, receipts and photos in reading order, as text and Markdown, with every line and word&#x27;s bounding box and confidence. PaddleOCR. $0.003 per image.">
+<link rel="canonical" href="https://tinplatelabs.github.io/image-ocr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Image OCR API for AI agents: text, Markdown and bounding boxes">
+<meta property="og:description" content="Extract text from screenshots, scans, receipts and photos in reading order, as text and Markdown, with every line and word&#x27;s bounding box and confidence. PaddleOCR. $0.003 per image.">
+<meta property="og:url" content="https://tinplatelabs.github.io/image-ocr/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Image OCR", "description": "Extract text from screenshots, scans, receipts and photos in reading order, as text and Markdown, with every line and word's bounding box and confidence. PaddleOCR. $0.003 per image.", "url": "https://tinplatelabs.github.io/image-ocr/", "sameAs": "https://apify.com/tinplatelabs/image-ocr", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "OCR", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.003", "priceCurrency": "USD", "description": "per image up to 4 megapixels", "url": "https://apify.com/tinplatelabs/image-ocr"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can it read PDFs?", "acceptedAnswer": {"@type": "Answer", "text": "No, images only. For PDFs, including scanned ones, use Document to Markdown, which OCRs pages without a text layer."}}, {"@type": "Question", "name": "Which languages are supported?", "acceptedAnswer": {"@type": "Answer", "text": "With no setting, English, Chinese, Japanese and 45+ Latin-script languages are read together. Name other languages by ISO code in languages (e.g. ru, ar, ko) to switch to Tesseract."}}, {"@type": "Question", "name": "How do I get the position of each line?", "acceptedAnswer": {"@type": "Answer", "text": "Each entry in lines has a box, a 4-point polygon, its block and paragraph number and a confidence; each word has its own box. Coordinates are in the original image's pixels."}}, {"@type": "Question", "name": "Can I send an image inline?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, as a base64 data:image/png;base64,... URI, or upload it to a key-value store and pass kvs://KEY."}}, {"@type": "Question", "name": "Does more memory cost more?", "acceptedAnswer": {"@type": "Answer", "text": "No. The price per image is the same at any memory; 4 GB is up to twice as fast as the default 2 GB."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">OCR · Apify Actor <code>tinplatelabs/image-ocr</code></p>
+<h1>Image OCR</h1>
+<p class="lede">Text from screenshots, scans and photos in reading order, with boxes and confidences.</p>
+<p class="note">The Apify Store listing for this Actor is being published in October 2026. If the Store link below doesn't open yet, check back in a day or two.</p><p><a class="cta" href="https://apify.com/tinplatelabs/image-ocr">Open Image OCR in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Agents and pipelines need the text in screenshots, scanned letters, receipts and photos of documents, in the order a person would read it, and often where on the image each line is.</p><p>Image OCR runs PaddleOCR PP-OCRv6 on CPU inside your run and returns, per image, plain text and Markdown that keep paragraphs and line breaks, plus every line and word with its bounding box, polygon and confidence. Two-column prose is read column by column; forms and tables row by row, so a label stays next to its value.</p>
+<ul><li>On our test set of rendered and degraded text, 0.1% character errors against 6.8% for Tesseract.</li><li>English, Chinese, Japanese and 45+ Latin-script languages together with no setup; Russian, Greek, Arabic, Hebrew, Hindi, Korean, Thai and more via Tesseract.</li><li>EXIF orientation applied, pages turned 90/180/270 degrees detected, small images enlarged; coordinates in the pixels of the image you sent.</li><li>Up to 500 images per run, every page of a multi-page TIFF; URLs, key-value store files or data: URIs.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;images&quot;: [
+    &quot;https://example.com/letter.gif&quot;,
+    &quot;kvs://receipt-0412.png&quot;
+  ],
+  &quot;keyValueStoreId&quot;: &quot;my-scans&quot;,
+  &quot;outputMarkdown&quot;: true
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;source&quot;: &quot;https://example.com/letter.gif&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;text&quot;: &quot;February 18, 1963\n\nDear President Kennedy:\n\nMy brother, Specialist James Delmas McAndrew, was one of the\nseven crew members killed ...&quot;,
+  &quot;lineCount&quot;: 36,
+  &quot;wordCount&quot;: 412,
+  &quot;meanConfidence&quot;: 0.9881,
+  &quot;orientation&quot;: {&quot;rotation&quot;: 0, &quot;skewDegrees&quot;: 0.29},
+  &quot;engine&quot;: &quot;paddleocr-v6&quot;,
+  &quot;image&quot;: {&quot;width&quot;: 577, &quot;height&quot;: 756, &quot;format&quot;: &quot;gif&quot;},
+  &quot;lines&quot;: [
+    {&quot;text&quot;: &quot;Dear President Kennedy:&quot;, &quot;confidence&quot;: 0.9952,
+     &quot;box&quot;: {&quot;x&quot;: 88, &quot;y&quot;: 121, &quot;width&quot;: 168, &quot;height&quot;: 17},
+     &quot;block&quot;: 1, &quot;paragraph&quot;: 2,
+     &quot;words&quot;: [{&quot;text&quot;: &quot;Dear&quot;, &quot;confidence&quot;: 0.998, &quot;box&quot;: {&quot;x&quot;: 88, &quot;y&quot;: 121, &quot;width&quot;: 33, &quot;height&quot;: 17}}]}
+  ]
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>image-ocr</code></td><td><strong>$0.003</strong></td><td>Each image (or TIFF page) up to 4 megapixels read successfully, also when it has no text</td></tr><tr><td><code>image-ocr-large</code></td><td><strong>$0.008</strong></td><td>Each image (or TIFF page) over 4 megapixels, e.g. a phone photo or a 300 dpi scan</td></tr></tbody></table>
+<p>1,000 screenshots cost $3; 100 phone photos cost $0.80. Platform usage is included; failed images are never charged. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>30 MB per file, 50 megapixels per page, 50 pages per TIFF, 500 images per run.</li><li>PNG, JPEG, WebP, TIFF, BMP, GIF (first frame). Not PDF: use Document to Markdown for PDFs.</li><li>Printed text; handwriting only when neat. Tables come out row by row, without cell structure.</li><li>About 5 to 7 s per screenshot or letter at the default 2 GB.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/image-ocr&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;images&quot;: [&quot;https://example.com/screenshot.png&quot;]}</code> and reads <code>text</code> or <code>markdown</code> from the dataset item, and <code>lines[].box</code> to locate what was read.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~image-ocr/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;images&quot;: [&quot;https://example.com/screenshot.png&quot;]}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Images are processed inside your run; results go only to its dataset. No third party, no telemetry, and only the exact URLs you give are fetched. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Can it read PDFs?</summary><p>No, images only. For PDFs, including scanned ones, use <a href="/document-to-markdown/">Document to Markdown</a>, which OCRs pages without a text layer.</p></details><details><summary>Which languages are supported?</summary><p>With no setting, English, Chinese, Japanese and 45+ Latin-script languages are read together. Name other languages by ISO code in <code>languages</code> (e.g. <code>ru</code>, <code>ar</code>, <code>ko</code>) to switch to Tesseract.</p></details><details><summary>How do I get the position of each line?</summary><p>Each entry in <code>lines</code> has a <code>box</code>, a 4-point <code>polygon</code>, its block and paragraph number and a confidence; each word has its own box. Coordinates are in the original image's pixels.</p></details><details><summary>Can I send an image inline?</summary><p>Yes, as a base64 <code>data:image/png;base64,...</code> URI, or upload it to a key-value store and pass <code>kvs://KEY</code>.</p></details><details><summary>Does more memory cost more?</summary><p>No. The price per image is the same at any memory; 4 GB is up to twice as fast as the default 2 GB.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/image-ocr">Try Image OCR on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

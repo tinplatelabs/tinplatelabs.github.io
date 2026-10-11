@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain security check API: SPF, DMARC, DNSSEC, TLS and RDAP</title>
+<meta name="description" content="One graded verdict per domain: RDAP registration and expiry, DNS and DNSSEC, SPF lookup count, DMARC, MTA-STS, DKIM and TLS certificate, with findings and fixes. $0.003 per domain.">
+<link rel="canonical" href="https://tinplatelabs.github.io/domain-intel/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Domain security check API: SPF, DMARC, DNSSEC, TLS and RDAP">
+<meta property="og:description" content="One graded verdict per domain: RDAP registration and expiry, DNS and DNSSEC, SPF lookup count, DMARC, MTA-STS, DKIM and TLS certificate, with findings and fixes. $0.003 per domain.">
+<meta property="og:url" content="https://tinplatelabs.github.io/domain-intel/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Domain Intel", "description": "One graded verdict per domain: RDAP registration and expiry, DNS and DNSSEC, SPF lookup count, DMARC, MTA-STS, DKIM and TLS certificate, with findings and fixes. $0.003 per domain.", "url": "https://tinplatelabs.github.io/domain-intel/", "sameAs": "https://apify.com/tinplatelabs/domain-intel", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Domain and e-mail security", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.003", "priceCurrency": "USD", "description": "per domain analyzed", "url": "https://apify.com/tinplatelabs/domain-intel"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How is the SPF 10-lookup limit counted?", "acceptedAnswer": {"@type": "Answer", "text": "Every include, a, mx, ptr, exists and redirect counts, including those inside nested includes, as RFC 7208 says. More than 10 is a SPF_TOO_MANY_LOOKUPS finding; more than 2 void lookups is flagged too."}}, {"@type": "Question", "name": "How is the grade calculated?", "acceptedAnswer": {"@type": "Answer", "text": "The score starts at 100; each finding subtracts points (critical 30, high 15, medium 7, low 2). A is 90 or more, B 80, C 70, D 60, otherwise F. Any critical finding caps the grade at D."}}, {"@type": "Question", "name": "Does it return registrant names or e-mails?", "acceptedAnswer": {"@type": "Answer", "text": "No. Personal contact data in RDAP responses is dropped and never appears in the output."}}, {"@type": "Question", "name": "Why does my domain show no DKIM?", "acceptedAnswer": {"@type": "Answer", "text": "DKIM keys live under selector names that can't be listed. Without dkimSelectors a few common selectors are probed and only found keys are reported; pass yours for a definite answer."}}, {"@type": "Question", "name": "Can I check a domain that doesn't send mail?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Domains with a null MX (MX 0 .) are not marked down for missing MTA-STS or TLS-RPT."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Domain and e-mail security · Apify Actor <code>tinplatelabs/domain-intel</code></p>
+<h1>Domain Intel</h1>
+<p class="lede">Registration, DNS, e-mail security and TLS for any domain, graded, with concrete fixes.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/domain-intel">Open Domain Intel in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Checking a domain properly means five tools: a WHOIS lookup, a DNS client, an SPF checker that counts nested includes, a DMARC parser and a TLS probe, followed by reading raw TXT records and deciding what matters.</p><p>Domain Intel does all of it in one call and returns one record per domain with an A to F grade, a one-line summary and a list of findings, each with a severity and a fix. It accepts domains, URLs or e-mail addresses and reduces them to the registrable domain.</p>
+<ul><li>Registration from official RDAP (found through IANA's bootstrap registry), never WHOIS scraping: registrar, dates, days to expiry, EPP status.</li><li>SPF DNS lookups counted recursively through every nested include and redirect, void lookups too, the way receiving servers count them.</li><li>DMARC policy and alignment, MTA-STS policy file, TLS-RPT, BIMI and DKIM key size per selector.</li><li>TLS certificate on the apex and www: trust, issuer, days left, hostname match.</li><li>Unknown domains, typos and failures cost nothing.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;domains&quot;: [
+    &quot;example.com&quot;,
+    &quot;https://www.example.org/pricing&quot;,
+    &quot;jane@example.net&quot;
+  ],
+  &quot;dkimSelectors&quot;: [
+    &quot;google&quot;,
+    &quot;selector1&quot;
+  ]
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;domain&quot;: &quot;example.org&quot;,
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;grade&quot;: &quot;C&quot;,
+  &quot;score&quot;: 74,
+  &quot;summary&quot;: &quot;example.org: grade C (74/100), 1 high, 1 medium, 2 low. Most important: SPF exceeds 10 DNS lookups (12), so receivers return permerror and SPF fails.&quot;,
+  &quot;findings&quot;: [
+    {&quot;id&quot;: &quot;SPF_TOO_MANY_LOOKUPS&quot;, &quot;severity&quot;: &quot;high&quot;, &quot;category&quot;: &quot;email&quot;,
+     &quot;message&quot;: &quot;SPF exceeds 10 DNS lookups (12), so receivers return permerror and SPF fails.&quot;,
+     &quot;fix&quot;: &quot;Flatten includes or remove unused ones until the record needs 10 or fewer lookups.&quot;},
+    {&quot;id&quot;: &quot;DMARC_POLICY_NONE&quot;, &quot;severity&quot;: &quot;medium&quot;, &quot;category&quot;: &quot;email&quot;,
+     &quot;message&quot;: &quot;DMARC policy is p=none (monitoring only), so spoofed mail is still delivered.&quot;,
+     &quot;fix&quot;: &quot;After checking the aggregate reports, change to p=quarantine and then p=reject.&quot;}
+  ],
+  &quot;registration&quot;: {&quot;rdap&quot;: &quot;ok&quot;, &quot;registrar&quot;: &quot;Example Registrar, Inc.&quot;, &quot;expires&quot;: &quot;2027-05-01T00:00:00Z&quot;, &quot;daysToExpiry&quot;: 202},
+  &quot;dns&quot;: {&quot;resolves&quot;: true, &quot;mx&quot;: [{&quot;priority&quot;: 10, &quot;host&quot;: &quot;mx1.mailhost.net&quot;}], &quot;dnssec&quot;: {&quot;signed&quot;: false}},
+  &quot;email&quot;: {&quot;spf&quot;: {&quot;lookups&quot;: 12, &quot;valid&quot;: false}, &quot;dmarc&quot;: {&quot;policy&quot;: &quot;none&quot;}},
+  &quot;tls&quot;: {&quot;apex&quot;: {&quot;trusted&quot;: true, &quot;issuer&quot;: &quot;Let&#x27;s Encrypt&quot;, &quot;daysLeft&quot;: 50, &quot;sanMatch&quot;: true}}
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>domain-analyzed</code></td><td><strong>$0.003</strong></td><td>Each domain that gets a verdict</td></tr></tbody></table>
+<p>1,000 domains cost $3. Invalid entries, nonexistent domains, DNS failures and timeouts are never charged; duplicates are analyzed and charged once. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>5,000 domains per run. The registrable domain is analyzed: <code>blog.example.com</code> is checked as <code>example.com</code>.</li><li>DNS through public validating resolvers (Cloudflare and Google); 60 s per domain by default.</li><li>TLDs without RDAP show <code>rdap: "unavailable"</code>; WHOIS is never used.</li><li>TLS is checked on port 443 of the apex and www only. SMTP STARTTLS, DANE, blocklists and subdomain discovery are not covered.</li><li>DKIM keys can't be listed from DNS; pass your selectors for a definite answer.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/domain-intel&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;domains&quot;: [&quot;example.com&quot;]}</code> and reads <code>grade</code>, <code>summary</code> and <code>findings</code> from the first dataset item.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~domain-intel/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;domains&quot;: [&quot;example.com&quot;]}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Reads only public DNS, public registry (RDAP) data and the certificates the domain's own servers present. Registrant personal data is dropped. No LLM, no other third party. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>How is the SPF 10-lookup limit counted?</summary><p>Every <code>include</code>, <code>a</code>, <code>mx</code>, <code>ptr</code>, <code>exists</code> and <code>redirect</code> counts, including those inside nested includes, as RFC 7208 says. More than 10 is a <code>SPF_TOO_MANY_LOOKUPS</code> finding; more than 2 void lookups is flagged too.</p></details><details><summary>How is the grade calculated?</summary><p>The score starts at 100; each finding subtracts points (critical 30, high 15, medium 7, low 2). A is 90 or more, B 80, C 70, D 60, otherwise F. Any critical finding caps the grade at D.</p></details><details><summary>Does it return registrant names or e-mails?</summary><p>No. Personal contact data in RDAP responses is dropped and never appears in the output.</p></details><details><summary>Why does my domain show no DKIM?</summary><p>DKIM keys live under selector names that can't be listed. Without <code>dkimSelectors</code> a few common selectors are probed and only found keys are reported; pass yours for a definite answer.</p></details><details><summary>Can I check a domain that doesn&#x27;t send mail?</summary><p>Yes. Domains with a null MX (<code>MX 0 .</code>) are not marked down for missing MTA-STS or TLS-RPT.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/domain-intel">Try Domain Intel on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>
