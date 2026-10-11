@@ -13,6 +13,7 @@
 - [Dataset Toolkit](https://tinplatelabs.github.io/dataset-toolkit/): Merge Apify datasets and CSV, JSON, Excel or Parquet files, remove duplicates (exact or fuzzy), filter, sort and export to CSV, XLSX, JSON or Parquet. $0.002 per 1,000 rows. Store: https://apify.com/tinplatelabs/dataset-toolkit
 - [Image OCR](https://tinplatelabs.github.io/image-ocr/): Extract text from screenshots, scans, receipts and photos in reading order, as text and Markdown, with every line and word's bounding box and confidence. PaddleOCR. $0.003 per image. Store: https://apify.com/tinplatelabs/image-ocr
 - [Transcriber](https://tinplatelabs.github.io/transcriber/): Transcribe your audio and video files with Whisper: full text, timestamped segments, language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute. Store: https://apify.com/tinplatelabs/transcriber
+- [Video Frames](https://tinplatelabs.github.io/video-frames/): Extract frames from your videos every N seconds, N evenly spaced, at exact timestamps, keyframes or scene changes, plus a best-thumbnail pick and contact sheets. JPEG, PNG or WebP. $0.002 per frame. Store: https://apify.com/tinplatelabs/video-frames
 
 ## JetBrains plugin
 

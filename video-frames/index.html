@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video frame and thumbnail extractor API: scenes, keyframes, timestamps</title>
+<meta name="description" content="Extract frames from your videos every N seconds, N evenly spaced, at exact timestamps, keyframes or scene changes, plus a best-thumbnail pick and contact sheets. JPEG, PNG or WebP. $0.002 per frame.">
+<link rel="canonical" href="https://tinplatelabs.github.io/video-frames/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Video frame and thumbnail extractor API: scenes, keyframes, timestamps">
+<meta property="og:description" content="Extract frames from your videos every N seconds, N evenly spaced, at exact timestamps, keyframes or scene changes, plus a best-thumbnail pick and contact sheets. JPEG, PNG or WebP. $0.002 per frame.">
+<meta property="og:url" content="https://tinplatelabs.github.io/video-frames/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Video Frames", "description": "Extract frames from your videos every N seconds, N evenly spaced, at exact timestamps, keyframes or scene changes, plus a best-thumbnail pick and contact sheets. JPEG, PNG or WebP. $0.002 per frame.", "url": "https://tinplatelabs.github.io/video-frames/", "sameAs": "https://apify.com/tinplatelabs/video-frames", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Video", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.002", "priceCurrency": "USD", "description": "per frame", "url": "https://apify.com/tinplatelabs/video-frames"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I get frames from a YouTube video?", "acceptedAnswer": {"@type": "Answer", "text": "No. Video Frames works on files you supply and have the rights to. Platform page links get a free PLATFORM_URL_NOT_SUPPORTED error. Upload the file to a key-value store or give a direct link to your own storage."}}, {"@type": "Question", "name": "Which mode should I use?", "acceptedAnswer": {"@type": "Answer", "text": "count for a quick overview, interval for regular sampling, scenes for one frame per shot, keyframes for the encoder's own I-frames, thumbnail for one cover image."}}, {"@type": "Question", "name": "How accurate are the timestamps?", "acceptedAnswer": {"@type": "Answer", "text": "Each frame reports the time it was actually taken at, to the millisecond, plus its timecode and frame number."}}, {"@type": "Question", "name": "Where are the images?", "acceptedAnswer": {"@type": "Answer", "text": "In the run's key-value store, linked from each dataset item with a signed URL that works without an Apify token."}}, {"@type": "Question", "name": "Is my video sent anywhere?", "acceptedAnswer": {"@type": "Answer", "text": "No. ffmpeg runs inside your Apify run; nothing is sent to a third party."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Video · Apify Actor <code>tinplatelabs/video-frames</code></p>
+<h1>Video Frames</h1>
+<p class="lede">Frames, thumbnails, keyframes and scene changes from your video files, with timestamps.</p>
+<p class="note">The Apify Store listing for this Actor is being published in October 2026. If the Store link below doesn't open yet, check back in a day or two.</p><p><a class="cta" href="https://apify.com/tinplatelabs/video-frames">Open Video Frames in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Agents and pipelines can't watch video. They need a handful of well-chosen still frames with exact timestamps: for thumbnails, storyboards, vision-model datasets, moderation queues or to hand a video to a multimodal LLM as images.</p><p>Video Frames reads the video files you supply with ffmpeg and returns frames in the mode you pick: N evenly spaced, every N seconds, exact timestamps, every keyframe, the first frame of every scene, or the single best thumbnail. Each frame comes with its timestamp, timecode and size, each video with its duration, fps, resolution and codecs.</p>
+<ul><li>Six modes in one Actor, all limited to a start/end range if you like; timestamps as seconds, timecodes or percentages.</li><li>Scene detection with adjustable sensitivity and minimum scene length, with a scene-change score per frame.</li><li>Best thumbnail: candidates scored for sharpness, exposure and detail, skipping fades at the start and end.</li><li>JPEG, PNG or WebP, scaled to a maximum width; optional contact sheet with timecode labels.</li><li>Your files only: links to YouTube, TikTok and other platforms are refused, free of charge.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;videos&quot;: [
+    &quot;https://upload.wikimedia.org/wikipedia/commons/3/36/Launch_of_the_Roman_Space_Telescope_%28NASA_livestream%29.webm&quot;
+  ],
+  &quot;mode&quot;: &quot;scenes&quot;,
+  &quot;contactSheet&quot;: true,
+  &quot;format&quot;: &quot;webp&quot;,
+  &quot;maxWidth&quot;: 960
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;frame&quot;,
+  &quot;source&quot;: &quot;https://upload.wikimedia.org/.../Launch_of_the_Roman_Space_Telescope_%28NASA_livestream%29.webm&quot;,
+  &quot;frameIndex&quot;: 1,
+  &quot;timestamp&quot;: 17.424,
+  &quot;timecode&quot;: &quot;00:00:17.424&quot;,
+  &quot;width&quot;: 960,
+  &quot;height&quot;: 540,
+  &quot;format&quot;: &quot;webp&quot;,
+  &quot;key&quot;: &quot;001-Launch_of_the_Roman_Space_Telescope_-NASA_livestream-0002.webp&quot;,
+  &quot;url&quot;: &quot;https://api.apify.com/v2/key-value-stores/.../records/...-0002.webp?signature=...&quot;,
+  &quot;mode&quot;: &quot;scenes&quot;,
+  &quot;sceneScore&quot;: 0.5058
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>frame-extracted</code></td><td><strong>$0.002</strong></td><td>Each frame saved (any mode except thumbnail)</td></tr><tr><td><code>best-thumbnail</code></td><td><strong>$0.01</strong></td><td>Thumbnail mode: per started 10 candidates scored (default 10)</td></tr><tr><td><code>contact-sheet</code></td><td><strong>$0.005</strong></td><td>Each contact sheet</td></tr><tr><td><code>scene-scan-minute</code></td><td><strong>$0.01</strong></td><td>Scenes mode only: each started minute scanned, per 1080p30-sized unit (1080p60 counts 2, 4K30 counts 4)</td></tr><tr><td><code>apify-actor-start</code></td><td><strong>$0.0005 per GB</strong></td><td>Once per run, per GB of memory: $0.001 at the default 2 GB</td></tr></tbody></table>
+<p>10 frames from a video cost $0.02. A 10-minute 1080p30 video split into 40 scenes with a contact sheet costs $0.185. Failed videos are never charged, and the frame cap follows your maximum total charge. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>2 GB per file, 100 videos per run, up to 600 minutes per video (default limit 240), up to 5000 frames per video (default 300).</li><li>The first video track is used; HDR is tone-mapped by ffmpeg's default conversion.</li><li>Platform page links (YouTube, TikTok, Instagram, Vimeo, Twitch and similar) are refused.</li><li>Seeking modes are fast on any length; scenes mode decodes every frame (roughly real time for 1080p at the default 2 GB).</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/video-frames&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;videos&quot;: [&quot;https://example.com/clip.mp4&quot;], &quot;mode&quot;: &quot;count&quot;, &quot;frameCount&quot;: 8, &quot;maxWidth&quot;: 768}</code> and reads each frame's <code>url</code> and <code>timestamp</code> from the dataset items, and the <code>type: video</code> summary for duration, fps and resolution.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~video-frames/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;videos&quot;: [&quot;https://example.com/clip.mp4&quot;], &quot;mode&quot;: &quot;count&quot;, &quot;frameCount&quot;: 8, &quot;maxWidth&quot;: 768}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Videos are processed inside your run; results go only to its dataset and key-value store. No third party, no telemetry, and only the exact URLs you give are fetched. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Can I get frames from a YouTube video?</summary><p>No. Video Frames works on files you supply and have the rights to. Platform page links get a free <code>PLATFORM_URL_NOT_SUPPORTED</code> error. Upload the file to a key-value store or give a direct link to your own storage.</p></details><details><summary>Which mode should I use?</summary><p><code>count</code> for a quick overview, <code>interval</code> for regular sampling, <code>scenes</code> for one frame per shot, <code>keyframes</code> for the encoder's own I-frames, <code>thumbnail</code> for one cover image.</p></details><details><summary>How accurate are the timestamps?</summary><p>Each frame reports the time it was actually taken at, to the millisecond, plus its timecode and frame number.</p></details><details><summary>Where are the images?</summary><p>In the run's key-value store, linked from each dataset item with a signed URL that works without an Apify token.</p></details><details><summary>Is my video sent anywhere?</summary><p>No. ffmpeg runs inside your Apify run; nothing is sent to a third party.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/video-frames">Try Video Frames on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>
