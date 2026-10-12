@@ -23,7 +23,7 @@
 <p class="meta">OCR · Apify Actor <code>tinplatelabs/image-ocr</code></p>
 <h1>Image OCR</h1>
 <p class="lede">Text from screenshots, scans and photos in reading order, with boxes and confidences.</p>
-<p class="note">The Apify Store listing for this Actor is being published in October 2026. If the Store link below doesn't open yet, check back in a day or two.</p><p><a class="cta" href="https://apify.com/tinplatelabs/image-ocr">Open Image OCR in the Apify Store</a></p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/image-ocr">Open Image OCR in the Apify Store</a></p>
 <h2>What it solves</h2>
 <p>Agents and pipelines need the text in screenshots, scanned letters, receipts and photos of documents, in the order a person would read it, and often where on the image each line is.</p><p>Image OCR runs PaddleOCR PP-OCRv6 on CPU inside your run and returns, per image, plain text and Markdown that keep paragraphs and line breaks, plus every line and word with its bounding box, polygon and confidence. Two-column prose is read column by column; forms and tables row by row, so a label stays next to its value.</p>
 <ul><li>On our test set of rendered and degraded text, 0.1% character errors against 6.8% for Tesseract.</li><li>English, Chinese, Japanese and 45+ Latin-script languages together with no setup; Russian, Greek, Arabic, Hebrew, Hindi, Korean, Thai and more via Tesseract.</li><li>EXIF orientation applied, pages turned 90/180/270 degrees detected, small images enlarged; coordinates in the pixels of the image you sent.</li><li>Up to 500 images per run, every page of a multi-page TIFF; URLs, key-value store files or data: URIs.</li></ul>
