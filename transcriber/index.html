@@ -3,37 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Whisper audio and video transcription API with SRT and VTT</title>
-<meta name="description" content="Transcribe your audio and video files with Whisper: full text, timestamped segments, language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute.">
+<title>Whisper audio and video transcription API with speaker labels, SRT and VTT</title>
+<meta name="description" content="Transcribe your audio and video files with Whisper: full text, timestamped segments, speaker labels (diarization), language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute.">
 <link rel="canonical" href="https://tinplatelabs.github.io/transcriber/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tinplate Labs">
-<meta property="og:title" content="Whisper audio and video transcription API with SRT and VTT">
-<meta property="og:description" content="Transcribe your audio and video files with Whisper: full text, timestamped segments, language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute.">
+<meta property="og:title" content="Whisper audio and video transcription API with speaker labels, SRT and VTT">
+<meta property="og:description" content="Transcribe your audio and video files with Whisper: full text, timestamped segments, speaker labels (diarization), language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute.">
 <meta property="og:url" content="https://tinplatelabs.github.io/transcriber/">
 <meta name="twitter:card" content="summary">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/style.css">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Transcriber", "description": "Transcribe your audio and video files with Whisper: full text, timestamped segments, language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute.", "url": "https://tinplatelabs.github.io/transcriber/", "sameAs": "https://apify.com/tinplatelabs/transcriber", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Speech to text", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.007", "priceCurrency": "USD", "description": "per audio minute (base model)", "url": "https://apify.com/tinplatelabs/transcriber"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I transcribe a YouTube video?", "acceptedAnswer": {"@type": "Answer", "text": "No. Transcriber works on media files you supply and have the rights to. Platform page links get a free PLATFORM_URL_NOT_SUPPORTED error. Upload the file to a key-value store or give a direct link to your own storage."}}, {"@type": "Question", "name": "Which Whisper model should I pick?", "acceptedAnswer": {"@type": "Answer", "text": "base for clear speech and the lowest price, small for accents, noise and non-English audio, medium for the best accuracy."}}, {"@type": "Question", "name": "Does it identify speakers?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no diarization; segments have timestamps but no speaker labels."}}, {"@type": "Question", "name": "How do I get subtitles?", "acceptedAnswer": {"@type": "Answer", "text": "With saveSubtitleFiles on (the default), SRT, VTT and TXT files are saved to the run's key-value store and linked in files with signed URLs."}}, {"@type": "Question", "name": "Is my audio sent to a speech-to-text API?", "acceptedAnswer": {"@type": "Answer", "text": "No. Whisper runs inside your Apify run; nothing is sent to a third party."}}]}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Transcriber", "description": "Transcribe your audio and video files with Whisper: full text, timestamped segments, speaker labels (diarization), language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute.", "url": "https://tinplatelabs.github.io/transcriber/", "sameAs": "https://apify.com/tinplatelabs/transcriber", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Speech to text", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.007", "priceCurrency": "USD", "description": "per audio minute (base model)", "url": "https://apify.com/tinplatelabs/transcriber"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I transcribe a YouTube video?", "acceptedAnswer": {"@type": "Answer", "text": "No. Transcriber works on media files you supply and have the rights to. Platform page links get a free PLATFORM_URL_NOT_SUPPORTED error. Upload the file to a key-value store or give a direct link to your own storage."}}, {"@type": "Question", "name": "Which Whisper model should I pick?", "acceptedAnswer": {"@type": "Answer", "text": "base for clear speech and the lowest price, small for accents, noise and non-English audio, medium for the best accuracy."}}, {"@type": "Question", "name": "Does it identify speakers?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no diarization; segments have timestamps but no speaker labels."}}, {"@type": "Question", "name": "How do I get subtitles?", "acceptedAnswer": {"@type": "Answer", "text": "With saveSubtitleFiles on (the default), SRT, VTT and TXT files are saved to the run's key-value store and linked in files with signed URLs."}}, {"@type": "Question", "name": "Is my audio sent to a speech-to-text API?", "acceptedAnswer": {"@type": "Answer", "text": "No. Whisper runs inside your Apify run; nothing is sent to a third party."}}]}]</script>
 </head>
 <body>
 <header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
 <main>
 <p class="meta">Speech to text · Apify Actor <code>tinplatelabs/transcriber</code></p>
 <h1>Transcriber</h1>
-<p class="lede">Whisper transcription of your audio and video files, with timestamps and SRT/VTT subtitles.</p>
+<p class="lede">Whisper transcription of your audio and video files, with timestamps, speaker labels and SRT/VTT subtitles.</p>
 <p><a class="cta" href="https://apify.com/tinplatelabs/transcriber">Open Transcriber in the Apify Store</a></p>
 <h2>What it solves</h2>
 <p>Interviews, meetings, podcasts, lectures and voice notes are useless to an agent until they are text, ideally with timestamps and subtitles, at a predictable per-minute price and without sending the audio to yet another speech API.</p><p>Transcriber runs OpenAI's Whisper (MIT) via faster-whisper on CPU inside your run. It returns the full transcript, timestamped segments (and word timings on request), the detected language with a confidence score, and SRT, WebVTT and plain-text files. Choose base, small or medium by accuracy and price.</p>
-<ul><li>99 languages with automatic detection, or set the language; optional translation to English.</li><li>Silero voice activity detection skips silence and music, which avoids invented text in quiet parts.</li><li>MP3, M4A, WAV, FLAC, OGG/Opus, WebM, MP4, MOV, MKV and more; video is transcribed from its audio track.</li><li>Up to 5 hours per file; long recordings are cut at quiet moments and stitched back on one timeline.</li><li>Your files only: links to YouTube, TikTok and other platforms are refused, free of charge.</li></ul>
+<ul><li>Speaker labels (diarization): every segment says who spoke (SPEAKER_1, SPEAKER_2, ...), also in the subtitle and text files; the number of speakers is detected or set with numSpeakers.</li><li>99 languages with automatic detection, or set the language; optional translation to English.</li><li>Silero voice activity detection skips silence and music, which avoids invented text in quiet parts.</li><li>MP3, M4A, WAV, FLAC, OGG/Opus, WebM, MP4, MOV, MKV and more; video is transcribed from its audio track.</li><li>Up to 5 hours per file; long recordings are cut at quiet moments and stitched back on one timeline.</li><li>Your files only: links to YouTube, TikTok and other platforms are refused, free of charge.</li></ul>
 <h2>Example input</h2>
 <pre><code class="language-json">{
   &quot;media&quot;: [
     &quot;https://upload.wikimedia.org/wikipedia/commons/3/35/First_Inauguration_of_FDR_-_Fear_Itself_Excerpt.ogg&quot;
   ],
   &quot;model&quot;: &quot;small&quot;,
-  &quot;wordTimestamps&quot;: true
+  &quot;diarization&quot;: true
 }</code></pre>
 <h2>Example output</h2>
 <p>One dataset item per input (abridged):</p>
@@ -53,13 +53,13 @@
     &quot;txt&quot;: {&quot;key&quot;: &quot;...txt&quot;, &quot;url&quot;: &quot;https://...&quot;}
   },
   &quot;segments&quot;: [
-    {&quot;id&quot;: 0, &quot;start&quot;: 0.0, &quot;end&quot;: 6.2, &quot;text&quot;: &quot;So first of all, let me assert my firm belief&quot;}
+    {&quot;id&quot;: 0, &quot;start&quot;: 0.0, &quot;end&quot;: 6.2, &quot;text&quot;: &quot;So first of all, let me assert my firm belief&quot;, &quot;speaker&quot;: &quot;SPEAKER_1&quot;}
   ]
 }</code></pre>
 <p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
 <h2>Pricing</h2>
 <p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
-<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>minute-transcribed-base</code></td><td><strong>$0.007</strong></td><td>Each started minute of audio transcribed with base</td></tr><tr><td><code>minute-transcribed-small</code></td><td><strong>$0.016</strong></td><td>Each started minute with small</td></tr><tr><td><code>minute-transcribed-medium</code></td><td><strong>$0.055</strong></td><td>Each started minute with medium</td></tr><tr><td><code>apify-actor-start</code></td><td><strong>$0.0025 per GB</strong></td><td>Once per run, per GB of memory: $0.01 at the default 4 GB</td></tr></tbody></table>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>minute-transcribed-base</code></td><td><strong>$0.007</strong></td><td>Each started minute of audio transcribed with base</td></tr><tr><td><code>minute-transcribed-small</code></td><td><strong>$0.016</strong></td><td>Each started minute with small</td></tr><tr><td><code>minute-transcribed-medium</code></td><td><strong>$0.055</strong></td><td>Each started minute with medium</td></tr><tr><td><code>minute-diarized</code></td><td><strong>$0.003</strong></td><td>Each started minute with speaker labels (diarization); free until 2026-11-10</td></tr><tr><td><code>apify-actor-start</code></td><td><strong>$0.0025 per GB</strong></td><td>Once per run, per GB of memory: $0.01 at the default 4 GB</td></tr></tbody></table>
 <p>A 1-hour podcast costs $0.43 with base or $0.97 with small, including the run start. A 61-second clip counts as 2 minutes. Send many files in one run to pay the start fee once. Failed files are never charged. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
 <h2>Limits</h2>
 <ul><li>1 GB per file, 200 files per run, up to 300 minutes per file (default limit 180).</li><li>One audio track per file; no speaker labels (diarization).</li><li>Platform page links (YouTube, TikTok, Instagram, Vimeo, SoundCloud, Spotify and similar) are refused.</li><li>At the default 4 GB, base transcribes about 10 minutes of audio per minute, small about 4, medium a little over 1.</li></ul>
