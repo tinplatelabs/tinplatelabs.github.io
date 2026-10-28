@@ -3,52 +3,73 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HTTP request tool for AI agents: JSON, Markdown, retries, SSRF-safe</title>
-<meta name="description" content="Batch HTTP requests for AI agents: parsed JSON, HTML as Markdown of the main content, redirect chain, timing, TLS details, retries and SSRF protection. $0.001 per request.">
+<title>HTTP request and bulk API calls: extract JSON fields, URL to Markdown</title>
+<meta name="description" content="Send HTTP requests and bulk API calls (GET, POST, PUT, PATCH, DELETE): extract JSON fields into columns, HTML as Markdown, retries, redirects, timing and SSRF protection. For Clay, n8n, Make and AI agents. $0.001 per request.">
 <link rel="canonical" href="https://tinplatelabs.github.io/agent-http/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tinplate Labs">
-<meta property="og:title" content="HTTP request tool for AI agents: JSON, Markdown, retries, SSRF-safe">
-<meta property="og:description" content="Batch HTTP requests for AI agents: parsed JSON, HTML as Markdown of the main content, redirect chain, timing, TLS details, retries and SSRF protection. $0.001 per request.">
+<meta property="og:title" content="HTTP request and bulk API calls: extract JSON fields, URL to Markdown">
+<meta property="og:description" content="Send HTTP requests and bulk API calls (GET, POST, PUT, PATCH, DELETE): extract JSON fields into columns, HTML as Markdown, retries, redirects, timing and SSRF protection. For Clay, n8n, Make and AI agents. $0.001 per request.">
 <meta property="og:url" content="https://tinplatelabs.github.io/agent-http/">
 <meta name="twitter:card" content="summary">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/style.css">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "HTTP Request Tool for Agents", "description": "Batch HTTP requests for AI agents: parsed JSON, HTML as Markdown of the main content, redirect chain, timing, TLS details, retries and SSRF protection. $0.001 per request.", "url": "https://tinplatelabs.github.io/agent-http/", "sameAs": "https://apify.com/tinplatelabs/agent-http", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "HTTP and APIs", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.001", "priceCurrency": "USD", "description": "per request completed", "url": "https://apify.com/tinplatelabs/agent-http"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this a web scraper?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is a plain HTTP client: no proxy rotation, no fingerprint spoofing, no CAPTCHA or anti-bot evasion, and the default User-Agent identifies the Actor. You are responsible for the terms of the sites and APIs you call."}}, {"@type": "Question", "name": "How do I pass an API key safely?", "acceptedAnswer": {"@type": "Answer", "text": "Use the authorization input (stored encrypted, never output) or per-request headers. Authorization, cookie and API-key headers and query parameters are redacted in the dataset and log."}}, {"@type": "Question", "name": "What does an agent get for an HTML page?", "acceptedAnswer": {"@type": "Answer", "text": "Markdown of the main content, with navigation, cookie banners, sidebars and footers stripped and links made absolute, cut to the token budget. Use htmlFormat for full-page Markdown, text or raw HTML."}}, {"@type": "Question", "name": "Can it check a list of links for broken ones?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. mode: url-health returns broken, the reason (e.g. HTTP 404, DNS_FAILED), redirect count, response time and TLS days left, without downloading bodies."}}, {"@type": "Question", "name": "Why are 404 responses charged?", "acceptedAnswer": {"@type": "Answer", "text": "A 404 is a successful HTTP exchange with an answer you can act on. Only requests that get no response at all are free."}}]}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "HTTP Request & Bulk API Calls", "description": "Send HTTP requests and bulk API calls (GET, POST, PUT, PATCH, DELETE): extract JSON fields into columns, HTML as Markdown, retries, redirects, timing and SSRF protection. For Clay, n8n, Make and AI agents. $0.001 per request.", "url": "https://tinplatelabs.github.io/agent-http/", "sameAs": "https://apify.com/tinplatelabs/agent-http", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "HTTP and APIs", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.001", "priceCurrency": "USD", "description": "per request completed", "url": "https://apify.com/tinplatelabs/agent-http"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this a web scraper?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is a plain HTTP client: no proxy rotation, no fingerprint spoofing, no CAPTCHA or anti-bot evasion, and the default User-Agent identifies the Actor. You are responsible for the terms of the sites and APIs you call."}}, {"@type": "Question", "name": "How do I pass an API key safely?", "acceptedAnswer": {"@type": "Answer", "text": "Use the authorization input (stored encrypted, never output) or per-request headers. Authorization, cookie and API-key headers and query parameters are redacted in the dataset and log."}}, {"@type": "Question", "name": "What does an agent get for an HTML page?", "acceptedAnswer": {"@type": "Answer", "text": "Markdown of the main content, with navigation, cookie banners, sidebars and footers stripped and links made absolute, cut to the token budget. Use htmlFormat for full-page Markdown, text or raw HTML."}}, {"@type": "Question", "name": "Can it check a list of links for broken ones?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. mode: url-health returns broken, the reason (e.g. HTTP 404, DNS_FAILED), redirect count, response time and TLS days left, without downloading bodies."}}, {"@type": "Question", "name": "Can I get just a few fields from a big JSON API response?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. extract maps output names to paths such as data.user.name, items[-1].id or items[*].id; the values land in extracted (null and listed in extractMissing when a path matches nothing). It reads the whole JSON, even when body is cut by the token budget, and costs nothing extra. Add includeBody: false to drop the body."}}, {"@type": "Question", "name": "Why are 404 responses charged?", "acceptedAnswer": {"@type": "Answer", "text": "A 404 is a successful HTTP exchange with an answer you can act on. Only requests that get no response at all are free."}}]}]</script>
 </head>
 <body>
 <header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
 <main>
 <p class="meta">HTTP and APIs · Apify Actor <code>tinplatelabs/agent-http</code></p>
-<h1>HTTP Request Tool for Agents</h1>
-<p class="lede">Agent-ready HTTP client: parsed JSON, page Markdown, retries, token budget, SSRF-safe.</p>
-<p><a class="cta" href="https://apify.com/tinplatelabs/agent-http">Open HTTP Request Tool for Agents in the Apify Store</a></p>
+<h1>HTTP Request &amp; Bulk API Calls</h1>
+<p class="lede">HTTP requests and bulk API calls: pick JSON fields, page Markdown, retries, SSRF-safe.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/agent-http">Open HTTP Request &amp; Bulk API Calls in the Apify Store</a></p>
 <h2>What it solves</h2>
-<p>Agents that call APIs or read web pages get raw HTML full of navigation and cookie banners, multi-megabyte bodies that flood the context window, and no help with retries, redirects or rate limits.</p><p>HTTP Request Tool for Agents sends a batch of requests and returns one clean record per request: status, headers, the body as parsed JSON or as Markdown of the page's main content, the full redirect chain, a timing breakdown and TLS certificate details. A token budget cuts long bodies at a paragraph boundary and says so. A URL health mode checks lists of links.</p>
-<ul><li><code>maxBodyTokens</code> (default 8,000) keeps one huge page from flooding the context.</li><li>Retries on 429/5xx and connection failures with backoff, honouring Retry-After; POST/PATCH only retried when safe.</li><li>Private, loopback, link-local and cloud-metadata addresses refused, also after redirects and DNS resolution.</li><li>Authorization, cookies and API-key headers redacted in output and log; credentials not forwarded to another host on redirect.</li><li>Binary bodies saved to the key-value store and returned as a URL.</li></ul>
+<p>Agents that call APIs or read web pages get raw HTML full of navigation and cookie banners, multi-megabyte bodies that flood the context window, and no help with retries, redirects or rate limits.</p><p>HTTP Request & Bulk API Calls sends one or 10,000 requests per run and returns one clean record per request: status, headers, the JSON fields you pick (<code>extract</code>), the body as parsed JSON or as Markdown of the page's main content, the full redirect chain, a timing breakdown and TLS certificate details. A token budget cuts long bodies at a paragraph boundary and says so. A URL health mode checks lists of links.</p>
+<ul><li><code>extract</code> picks JSON fields by path (<code>data.items[0].id</code>, <code>items[*].id</code>) into <code>extracted</code>, read from the whole JSON even past the token budget; <code>includeBody: false</code> keeps rows small for Clay, n8n or Make.</li><li><code>maxBodyTokens</code> (default 8,000) keeps one huge page from flooding the context.</li><li>Retries on 429/5xx and connection failures with backoff, honouring Retry-After; POST/PATCH only retried when safe.</li><li>Private, loopback, link-local and cloud-metadata addresses refused, also after redirects and DNS resolution.</li><li>Authorization, cookies and API-key headers redacted in output and log; credentials not forwarded to another host on redirect.</li><li>Binary bodies saved to the key-value store and returned as a URL.</li></ul>
 <h2>Example input</h2>
 <pre><code class="language-json">{
   &quot;requests&quot;: [
     {
-      &quot;method&quot;: &quot;GET&quot;,
-      &quot;url&quot;: &quot;https://httpbin.org/json&quot;
+      &quot;url&quot;: &quot;https://jsonplaceholder.typicode.com/users/1&quot;,
+      &quot;label&quot;: &quot;user&quot;,
+      &quot;extract&quot;: {
+        &quot;name&quot;: &quot;name&quot;,
+        &quot;email&quot;: &quot;email&quot;,
+        &quot;city&quot;: &quot;address.city&quot;,
+        &quot;company&quot;: &quot;company.name&quot;
+      }
     },
     {
       &quot;method&quot;: &quot;POST&quot;,
-      &quot;url&quot;: &quot;https://api.example.com/v1/search&quot;,
+      &quot;url&quot;: &quot;https://jsonplaceholder.typicode.com/posts&quot;,
+      &quot;label&quot;: &quot;create post&quot;,
       &quot;json&quot;: {
-        &quot;q&quot;: &quot;widgets&quot;
+        &quot;title&quot;: &quot;hello&quot;,
+        &quot;body&quot;: &quot;sent by an agent&quot;,
+        &quot;userId&quot;: 1
       },
-      &quot;label&quot;: &quot;search&quot;
+      &quot;extract&quot;: {
+        &quot;newId&quot;: &quot;id&quot;
+      }
     },
-    &quot;https://example.com&quot;
-  ],
-  &quot;maxBodyTokens&quot;: 4000
+    {
+      &quot;url&quot;: &quot;https://example.com&quot;,
+      &quot;label&quot;: &quot;web page as Markdown&quot;
+    }
+  ]
 }</code></pre>
 <h2>Example output</h2>
 <p>One dataset item per input (abridged):</p>
-<pre><code class="language-json">{
+<pre><code class="language-json">// first item, abridged (real output of the input above)
+{
+  &quot;index&quot;: 0, &quot;label&quot;: &quot;user&quot;, &quot;method&quot;: &quot;GET&quot;, &quot;url&quot;: &quot;https://jsonplaceholder.typicode.com/users/1&quot;,
+  &quot;status&quot;: &quot;ok&quot;, &quot;statusCode&quot;: 200, &quot;ok&quot;: true, &quot;bodyFormat&quot;: &quot;json&quot;,
+  &quot;extracted&quot;: {&quot;name&quot;: &quot;Leanne Graham&quot;, &quot;email&quot;: &quot;Sincere@april.biz&quot;, &quot;city&quot;: &quot;Gwenborough&quot;, &quot;company&quot;: &quot;Romaguera-Crona&quot;},
+  &quot;extractMissing&quot;: []
+}
+// an HTML page with a redirect
+{
   &quot;index&quot;: 0, &quot;label&quot;: &quot;docs&quot;, &quot;method&quot;: &quot;GET&quot;, &quot;url&quot;: &quot;https://example.com/docs&quot;,
   &quot;status&quot;: &quot;ok&quot;, &quot;statusCode&quot;: 200, &quot;ok&quot;: true,
   &quot;finalUrl&quot;: &quot;https://www.example.com/docs/&quot;,
@@ -90,8 +111,8 @@
 <h2>Privacy</h2>
 <p>Requests go only to the URLs you give (and their redirects). Secrets in headers are redacted in the dataset and log. No third party, no LLM, no telemetry. See also the <a href="/privacy/">privacy page</a>.</p>
 <h2>FAQ</h2>
-<details><summary>Is this a web scraper?</summary><p>No. It is a plain HTTP client: no proxy rotation, no fingerprint spoofing, no CAPTCHA or anti-bot evasion, and the default User-Agent identifies the Actor. You are responsible for the terms of the sites and APIs you call.</p></details><details><summary>How do I pass an API key safely?</summary><p>Use the <code>authorization</code> input (stored encrypted, never output) or per-request headers. Authorization, cookie and API-key headers and query parameters are redacted in the dataset and log.</p></details><details><summary>What does an agent get for an HTML page?</summary><p>Markdown of the main content, with navigation, cookie banners, sidebars and footers stripped and links made absolute, cut to the token budget. Use <code>htmlFormat</code> for full-page Markdown, text or raw HTML.</p></details><details><summary>Can it check a list of links for broken ones?</summary><p>Yes. <code>mode: url-health</code> returns <code>broken</code>, the reason (e.g. HTTP 404, DNS_FAILED), redirect count, response time and TLS days left, without downloading bodies.</p></details><details><summary>Why are 404 responses charged?</summary><p>A 404 is a successful HTTP exchange with an answer you can act on. Only requests that get no response at all are free.</p></details>
-<p><a class="cta" href="https://apify.com/tinplatelabs/agent-http">Try HTTP Request Tool for Agents on Apify</a></p>
+<details><summary>Is this a web scraper?</summary><p>No. It is a plain HTTP client: no proxy rotation, no fingerprint spoofing, no CAPTCHA or anti-bot evasion, and the default User-Agent identifies the Actor. You are responsible for the terms of the sites and APIs you call.</p></details><details><summary>How do I pass an API key safely?</summary><p>Use the <code>authorization</code> input (stored encrypted, never output) or per-request headers. Authorization, cookie and API-key headers and query parameters are redacted in the dataset and log.</p></details><details><summary>What does an agent get for an HTML page?</summary><p>Markdown of the main content, with navigation, cookie banners, sidebars and footers stripped and links made absolute, cut to the token budget. Use <code>htmlFormat</code> for full-page Markdown, text or raw HTML.</p></details><details><summary>Can it check a list of links for broken ones?</summary><p>Yes. <code>mode: url-health</code> returns <code>broken</code>, the reason (e.g. HTTP 404, DNS_FAILED), redirect count, response time and TLS days left, without downloading bodies.</p></details><details><summary>Can I get just a few fields from a big JSON API response?</summary><p>Yes. <code>extract</code> maps output names to paths such as <code>data.user.name</code>, <code>items[-1].id</code> or <code>items[*].id</code>; the values land in <code>extracted</code> (null and listed in <code>extractMissing</code> when a path matches nothing). It reads the whole JSON, even when <code>body</code> is cut by the token budget, and costs nothing extra. Add <code>includeBody: false</code> to drop the body.</p></details><details><summary>Why are 404 responses charged?</summary><p>A 404 is a successful HTTP exchange with an answer you can act on. Only requests that get no response at all are free.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/agent-http">Try HTTP Request &amp; Bulk API Calls on Apify</a></p>
 
 </main>
 <footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
