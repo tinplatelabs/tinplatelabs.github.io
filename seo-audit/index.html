@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEO audit tool: on-page SEO checker and website crawler</title>
+<meta name="description" content="SEO audit of any URL or whole site: titles, meta descriptions, headings, canonical, noindex, hreflang, Open Graph, schema JSON-LD, alt text, broken links, redirects. 0-100 score and prioritized fixes. $0.005 per page.">
+<link rel="canonical" href="https://tinplatelabs.github.io/seo-audit/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="SEO audit tool: on-page SEO checker and website crawler">
+<meta property="og:description" content="SEO audit of any URL or whole site: titles, meta descriptions, headings, canonical, noindex, hreflang, Open Graph, schema JSON-LD, alt text, broken links, redirects. 0-100 score and prioritized fixes. $0.005 per page.">
+<meta property="og:url" content="https://tinplatelabs.github.io/seo-audit/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "SEO Audit Tool", "description": "SEO audit of any URL or whole site: titles, meta descriptions, headings, canonical, noindex, hreflang, Open Graph, schema JSON-LD, alt text, broken links, redirects. 0-100 score and prioritized fixes. $0.005 per page.", "url": "https://tinplatelabs.github.io/seo-audit/", "sameAs": "https://apify.com/tinplatelabs/seo-audit", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "SEO and crawling", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.005", "priceCurrency": "USD", "description": "per page", "url": "https://apify.com/tinplatelabs/seo-audit"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How is the score calculated?", "acceptedAnswer": {"@type": "Answer", "text": "Each page starts at 100 and loses 30, 12, 6 or 2 points per critical, high, medium or low issue (floor 0). Category scores use the same rule per category. Issues are sorted most severe first, so the first one is the one to fix first."}}, {"@type": "Question", "name": "Does it check Core Web Vitals?", "acceptedAnswer": {"@type": "Answer", "text": "No. It runs no browser, so it reports server response time, HTML size and compression instead. Use a Lighthouse-based tool for lab Core Web Vitals."}}, {"@type": "Question", "name": "Can it audit a page my robots.txt blocks?", "acceptedAnswer": {"@type": "Answer", "text": "No, robots.txt is always obeyed. To audit your own blocked pages, add User-agent: TinplateSEOAudit with Allow: / to robots.txt."}}, {"@type": "Question", "name": "Where are the duplicate titles?", "acceptedAnswer": {"@type": "Answer", "text": "In the site summary (SITE_SUMMARY in the run's key-value store, linked from the Output tab), grouped with the pages that share them. Only indexable pages count."}}, {"@type": "Question", "name": "Why are 404 pages charged?", "acceptedAnswer": {"@type": "Answer", "text": "An error page is a finding you act on, so it gets a full record. Pages that never answer, pages blocked by robots.txt and non-HTML files are free."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">SEO and crawling · Apify Actor <code>tinplatelabs/seo-audit</code></p>
+<h1>SEO Audit Tool</h1>
+<p class="lede">On-page SEO audit per page with a 0-100 score, prioritized fixes and a site summary.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/seo-audit">Open SEO Audit Tool in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>An SEO audit means checking dozens of things on every page: title and description lengths, one H1, a self-referencing canonical, no stray noindex, valid hreflang, social cards, structured data, alt text, broken links, redirects. Desktop crawlers do it on one machine; hosted audit services charge per seat.</p><p>SEO Audit Tool fetches each page once and returns one record per page: the facts, an indexability verdict with the reason, a 0-100 score and the issues sorted most severe first, each with a fix. It can crawl a site (same site only, robots.txt obeyed) and writes a site summary with duplicate titles and descriptions, broken links and the issues that hit the most pages. Deterministic rules: no browser, no AI, same verdict every run.</p>
+<ul><li>Indexability: HTTP status, every redirect hop, robots meta and <code>X-Robots-Tag</code> (generic and Googlebot/Bingbot), canonical in HTML and the <code>Link</code> header.</li><li>Content: title and meta description presence, duplicates and length, heading outline and skipped levels, word count, charset, doctype, favicon, URL hygiene.</li><li>Structured data: JSON-LD parsed (including <code>@graph</code>) with <code>@type</code> values and JSON errors by line and column; microdata and RDFa types.</li><li>hreflang codes validated, duplicates, self-reference and <code>x-default</code>; Open Graph and Twitter card tags.</li><li>Images without <code>alt</code> or dimensions, internal/external/nofollow links, mixed content, viewport, response time, HTML size and compression.</li><li>Opt-in broken-link check (HEAD with GET fallback), each unique URL once per run, listed with the pages it is on.</li><li>Site summary in the key-value store: average score, top issues by pages affected, duplicate titles and descriptions, non-indexable pages, slowest pages, crawl coverage.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;startUrls&quot;: [
+    &quot;https://www.python.org/&quot;
+  ],
+  &quot;maxPages&quot;: 10
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">// one page, abridged
+{
+  &quot;url&quot;: &quot;https://www.example.com/news&quot;, &quot;finalUrl&quot;: &quot;https://www.example.com/news&quot;,
+  &quot;status&quot;: &quot;ok&quot;, &quot;httpStatus&quot;: 200, &quot;redirectChain&quot;: [], &quot;responseTimeMs&quot;: 212,
+  &quot;title&quot;: &quot;Example News - Breaking news, video and the latest top stories from around the world&quot;,
+  &quot;titleLength&quot;: 85, &quot;metaDescriptionLength&quot;: 249, &quot;h1&quot;: [&quot;News&quot;],
+  &quot;canonical&quot;: &quot;https://www.example.com/news&quot;, &quot;indexable&quot;: true, &quot;indexability&quot;: &quot;indexable&quot;,
+  &quot;structuredData&quot;: {&quot;jsonLdBlocks&quot;: 1, &quot;jsonLdTypes&quot;: [&quot;NewsMediaOrganization&quot;, &quot;WebPage&quot;], &quot;jsonLdErrors&quot;: []},
+  &quot;images&quot;: {&quot;total&quot;: 48, &quot;missingAlt&quot;: 24, &quot;emptyAlt&quot;: 0, &quot;missingDimensions&quot;: 48},
+  &quot;score&quot;: 80,
+  &quot;issues&quot;: [
+    {&quot;id&quot;: &quot;TITLE_TOO_LONG&quot;, &quot;severity&quot;: &quot;medium&quot;, &quot;category&quot;: &quot;content&quot;,
+     &quot;message&quot;: &quot;The title is 85 characters (over 60).&quot;,
+     &quot;fix&quot;: &quot;Shorten the title to about 60 characters so it is not cut off in results.&quot;},
+    {&quot;id&quot;: &quot;IMAGES_MISSING_ALT&quot;, &quot;severity&quot;: &quot;medium&quot;, &quot;category&quot;: &quot;images&quot;,
+     &quot;message&quot;: &quot;24 of 48 images have no alt attribute.&quot;,
+     &quot;fix&quot;: &quot;Add alt text to informative images (alt=\&quot;\&quot; for decorative ones).&quot;}
+  ]
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>page-audited</code></td><td><strong>$0.005</strong></td><td>Each page fetched and audited (4xx/5xx pages count: they are findings)</td></tr><tr><td><code>link-checked</code></td><td><strong>$0.0005</strong></td><td>Opt-in broken-link check: each unique linked URL requested, at most once per run</td></tr><tr><td><code>apify-actor-start</code></td><td><strong>$0.001 per GB</strong></td><td>Once per run, per GB of memory: $0.001 at the default 512 MB</td></tr></tbody></table>
+<p>A 100-page site audit costs about $0.50; checking 2,000 unique links adds $1. Invalid URLs, unreachable sites, pages blocked by robots.txt and non-HTML files cost nothing, and the crawl stops at your maximum total charge. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>10,000 start URLs per run and 10,000 pages per site; 5 MB of HTML per page.</li><li>Same-site crawl only (the start host and the host it redirects to); robots.txt is always obeyed.</li><li>JavaScript is not executed: pages are audited as served, which is what search engines see before rendering.</li><li>Only public internet addresses are reachable.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/seo-audit&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;startUrls&quot;: [&quot;https://example.com/pricing&quot;], &quot;crawl&quot;: false}</code> and reads <code>score</code>, <code>indexability</code> and <code>issues</code> (each with a <code>fix</code>) from the dataset items.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~seo-audit/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;startUrls&quot;: [&quot;https://example.com/pricing&quot;], &quot;crawl&quot;: false}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Only the pages you give, pages linked from them on the same site, and (if you ask) linked URLs for the broken-link check are fetched. No third party, no LLM, no telemetry. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>How is the score calculated?</summary><p>Each page starts at 100 and loses 30, 12, 6 or 2 points per critical, high, medium or low issue (floor 0). Category scores use the same rule per category. Issues are sorted most severe first, so the first one is the one to fix first.</p></details><details><summary>Does it check Core Web Vitals?</summary><p>No. It runs no browser, so it reports server response time, HTML size and compression instead. Use a Lighthouse-based tool for lab Core Web Vitals.</p></details><details><summary>Can it audit a page my robots.txt blocks?</summary><p>No, robots.txt is always obeyed. To audit your own blocked pages, add <code>User-agent: TinplateSEOAudit</code> with <code>Allow: /</code> to robots.txt.</p></details><details><summary>Where are the duplicate titles?</summary><p>In the site summary (<code>SITE_SUMMARY</code> in the run's key-value store, linked from the Output tab), grouped with the pages that share them. Only indexable pages count.</p></details><details><summary>Why are 404 pages charged?</summary><p>An error page is a finding you act on, so it gets a full record. Pages that never answer, pages blocked by robots.txt and non-HTML files are free.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/seo-audit">Try SEO Audit Tool on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

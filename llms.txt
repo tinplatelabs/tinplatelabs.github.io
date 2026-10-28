@@ -14,6 +14,7 @@
 - [Image OCR](https://tinplatelabs.github.io/image-ocr/): Extract text from screenshots, scans, receipts and photos in reading order, as text and Markdown, with every line and word's bounding box and confidence. PaddleOCR. $0.003 per image. Store: https://apify.com/tinplatelabs/image-ocr
 - [Transcriber](https://tinplatelabs.github.io/transcriber/): Transcribe your audio and video files with Whisper: full text, timestamped segments, speaker labels (diarization), language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute. Store: https://apify.com/tinplatelabs/transcriber
 - [Video Frames](https://tinplatelabs.github.io/video-frames/): Extract frames from your videos every N seconds, N evenly spaced, at exact timestamps, keyframes or scene changes, plus a best-thumbnail pick and contact sheets. JPEG, PNG or WebP. $0.002 per frame. Store: https://apify.com/tinplatelabs/video-frames
+- [SEO Audit Tool](https://tinplatelabs.github.io/seo-audit/): SEO audit of any URL or whole site: titles, meta descriptions, headings, canonical, noindex, hreflang, Open Graph, schema JSON-LD, alt text, broken links, redirects. 0-100 score and prioritized fixes. $0.005 per page. Store: https://apify.com/tinplatelabs/seo-audit
 
 ## JetBrains plugin
 
