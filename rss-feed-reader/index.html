@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSS feed reader and feed finder: RSS, Atom and JSON Feed to JSON</title>
+<meta name="description" content="RSS feed reader and feed finder: give feed URLs or just websites, get clean items from RSS, Atom and JSON Feed with dates, authors, content, images and podcast enclosures. Only new items since the last run. $0.0002 per item.">
+<link rel="canonical" href="https://tinplatelabs.github.io/rss-feed-reader/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="RSS feed reader and feed finder: RSS, Atom and JSON Feed to JSON">
+<meta property="og:description" content="RSS feed reader and feed finder: give feed URLs or just websites, get clean items from RSS, Atom and JSON Feed with dates, authors, content, images and podcast enclosures. Only new items since the last run. $0.0002 per item.">
+<meta property="og:url" content="https://tinplatelabs.github.io/rss-feed-reader/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "RSS Feed Reader & Feed Finder", "description": "RSS feed reader and feed finder: give feed URLs or just websites, get clean items from RSS, Atom and JSON Feed with dates, authors, content, images and podcast enclosures. Only new items since the last run. $0.0002 per item.", "url": "https://tinplatelabs.github.io/rss-feed-reader/", "sameAs": "https://apify.com/tinplatelabs/rss-feed-reader", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "SEO and crawling", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.0002", "priceCurrency": "USD", "description": "per item", "url": "https://apify.com/tinplatelabs/rss-feed-reader"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does only-new mode know what is new?", "acceptedAnswer": {"@type": "Answer", "text": "Each item gets a key from its guid (else its link, else title and date). The keys of the items in each feed are kept in a key-value store named feed-reader-only-new-&lt;onlyNewKey&gt; in your account, with the feed's ETag and Last-Modified. Delete the store to start over."}}, {"@type": "Question", "name": "Do I need the feed URL?", "acceptedAnswer": {"@type": "Answer", "text": "No. Give the website (for example theverge.com) and the Actor finds its feed. Giving the feed URL saves a request."}}, {"@type": "Question", "name": "Can it read podcasts?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Podcast feeds are RSS; the audio files are listed in enclosures with type and size."}}, {"@type": "Question", "name": "Why is the content only a teaser?", "acceptedAnswer": {"@type": "Answer", "text": "Many feeds publish only an excerpt. Turn on fetchFullArticle to fetch each page and add its main content as Markdown."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">SEO and crawling · Apify Actor <code>tinplatelabs/rss-feed-reader</code></p>
+<h1>RSS Feed Reader &amp; Feed Finder</h1>
+<p class="lede">Feeds or websites in, clean JSON posts out, with only-new monitoring and optional full articles.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/rss-feed-reader">Open RSS Feed Reader &amp; Feed Finder in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Every feed format names things differently: RSS has <code>pubDate</code> and <code>description</code>, Atom has <code>updated</code> and <code>content</code>, JSON Feed has <code>date_published</code> and <code>content_html</code>. Many sites don't link their feed at all, half the feeds have broken XML, and a scheduled job has to remember what it already saw.</p><p>RSS Feed Reader takes feed URLs or just websites, finds the feed when needed, and returns every post with the same fields: title, link, guid, ISO dates, author, summary, content as text, Markdown or HTML, categories, image, enclosures and media, plus the feed's own details. With only-new mode a schedule delivers just the posts it has not seen, and unchanged feeds are answered with a cheap 304.</p>
+<ul><li>RSS 0.9x, 1.0 (RDF) and 2.0, Atom 0.3 and 1.0, JSON Feed 1.0 and 1.1; broken XML is recovered and flagged.</li><li>Feed finder for websites: <code>&lt;link rel="alternate"&gt;</code>, feed links on the page, then common paths such as <code>/feed</code>, <code>/rss.xml</code>, <code>/atom.xml</code> and <code>/index.xml</code>; comment feeds come last.</li><li>Only new items: per-feed memory in a key-value store in your account, plus <code>ETag</code> / <code>Last-Modified</code> conditional requests.</li><li>Filters: newest first, max items per feed, only items published after a date or an age such as <code>7 days</code>.</li><li>Content as plain text, Markdown, sanitized HTML or none; podcast audio in <code>enclosures</code>, Media RSS in <code>media</code>.</li><li>Optional full article per item, main content as Markdown, robots.txt obeyed.</li><li>Feed summary in the key-value store: status per feed, items delivered, already seen and filtered out.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;startUrls&quot;: [
+    &quot;https://hnrss.org/frontpage&quot;,
+    &quot;https://www.theverge.com&quot;
+  ],
+  &quot;maxItemsPerFeed&quot;: 10
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">// one item, abridged
+{
+  &quot;type&quot;: &quot;item&quot;,
+  &quot;title&quot;: &quot;We moved our office&quot;,
+  &quot;link&quot;: &quot;https://blog.example.com/2026/10/we-moved&quot;,
+  &quot;guid&quot;: &quot;https://blog.example.com/?p=123&quot;,
+  &quot;published&quot;: &quot;2026-10-15T14:02:00Z&quot;,
+  &quot;author&quot;: &quot;Jane Doe&quot;,
+  &quot;summary&quot;: &quot;After ten years downtown we have a new home...&quot;,
+  &quot;content&quot;: &quot;After ten years downtown we have a new home. ...&quot;,
+  &quot;categories&quot;: [&quot;News&quot;],
+  &quot;enclosures&quot;: [],
+  &quot;feed&quot;: {&quot;url&quot;: &quot;https://blog.example.com/feed/&quot;, &quot;title&quot;: &quot;Example Blog&quot;, &quot;format&quot;: &quot;rss20&quot;},
+  &quot;source&quot;: &quot;https://blog.example.com&quot;
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>item-delivered</code></td><td><strong>$0.0002</strong></td><td>Each feed item delivered to the dataset</td></tr><tr><td><code>feed-read</code></td><td><strong>$0.0005</strong></td><td>Each feed fetched and parsed, or confirmed unchanged (304) in only-new mode</td></tr><tr><td><code>article-fetched</code></td><td><strong>$0.001</strong></td><td>Opt-in: each item&#x27;s page fetched and converted to Markdown</td></tr><tr><td><code>apify-actor-start</code></td><td><strong>$0.001 per GB</strong></td><td>Once per run, per GB of memory: $0.001 at the default 512 MB</td></tr></tbody></table>
+<p>Ten blogs with 20 posts each cost about $0.046. Checking the same ten daily in only-new mode, with three new posts, costs about $0.007 a day. Invalid URLs, unreachable sites, HTTP errors, websites without a feed, filtered items and articles blocked by robots.txt cost nothing. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>5,000 feed URLs or websites per run; 10 MB per feed; full articles up to 5 MB and 100,000 Markdown characters.</li><li>Public feeds only: no logins, no paywalls, no private addresses.</li><li>JavaScript is not executed, so articles that only render in a browser come out short.</li><li>robots.txt is obeyed for guessed feed paths and full-article pages.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/rss-feed-reader&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;startUrls&quot;: [&quot;https://blog.example.com&quot;], &quot;maxItemsPerFeed&quot;: 5, &quot;contentFormat&quot;: &quot;markdown&quot;}</code> and reads <code>title</code>, <code>link</code>, <code>published</code> and <code>content</code> from the dataset items.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~rss-feed-reader/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;startUrls&quot;: [&quot;https://blog.example.com&quot;], &quot;maxItemsPerFeed&quot;: 5, &quot;contentFormat&quot;: &quot;markdown&quot;}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Only the feeds and websites you give, the feeds they advertise or common feed paths on the same site, and (if you ask) the items' article pages are fetched. No third party, no LLM, no telemetry. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>How does only-new mode know what is new?</summary><p>Each item gets a key from its guid (else its link, else title and date). The keys of the items in each feed are kept in a key-value store named <code>feed-reader-only-new-&lt;onlyNewKey&gt;</code> in your account, with the feed's ETag and Last-Modified. Delete the store to start over.</p></details><details><summary>Do I need the feed URL?</summary><p>No. Give the website (for example <code>theverge.com</code>) and the Actor finds its feed. Giving the feed URL saves a request.</p></details><details><summary>Can it read podcasts?</summary><p>Yes. Podcast feeds are RSS; the audio files are listed in <code>enclosures</code> with type and size.</p></details><details><summary>Why is the content only a teaser?</summary><p>Many feeds publish only an excerpt. Turn on <code>fetchFullArticle</code> to fetch each page and add its main content as Markdown.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/rss-feed-reader">Try RSS Feed Reader &amp; Feed Finder on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>

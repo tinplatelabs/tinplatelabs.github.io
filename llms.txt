@@ -15,6 +15,7 @@
 - [Transcriber](https://tinplatelabs.github.io/transcriber/): Transcribe your audio and video files with Whisper: full text, timestamped segments, speaker labels (diarization), language detection, translation to English and SRT/WebVTT subtitles. From $0.007 per minute. Store: https://apify.com/tinplatelabs/transcriber
 - [Video Frames](https://tinplatelabs.github.io/video-frames/): Extract frames from your videos every N seconds, N evenly spaced, at exact timestamps, keyframes or scene changes, plus a best-thumbnail pick and contact sheets. JPEG, PNG or WebP. $0.002 per frame. Store: https://apify.com/tinplatelabs/video-frames
 - [SEO Audit Tool](https://tinplatelabs.github.io/seo-audit/): SEO audit of any URL or whole site: titles, meta descriptions, headings, canonical, noindex, hreflang, Open Graph, schema JSON-LD, alt text, broken links, redirects. 0-100 score and prioritized fixes. $0.005 per page. Store: https://apify.com/tinplatelabs/seo-audit
+- [RSS Feed Reader & Feed Finder](https://tinplatelabs.github.io/rss-feed-reader/): RSS feed reader and feed finder: give feed URLs or just websites, get clean items from RSS, Atom and JSON Feed with dates, authors, content, images and podcast enclosures. Only new items since the last run. $0.0002 per item. Store: https://apify.com/tinplatelabs/rss-feed-reader
 
 ## JetBrains plugin
 
