@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact page finder: contact form URLs, form kind and fields from websites</title>
+<meta name="description" content="Contact page finder for lead lists: the contact page URL of each website, whether it has a contact form and its kind (HTML, HubSpot, Typeform, Google Forms, Jotform, WPForms, Contact Form 7, Gravity, Elementor), form fields, CAPTCHA, emails, phones and social links. $0.003 per site found.">
+<link rel="canonical" href="https://tinplatelabs.github.io/contact-page-finder/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tinplate Labs">
+<meta property="og:title" content="Contact page finder: contact form URLs, form kind and fields from websites">
+<meta property="og:description" content="Contact page finder for lead lists: the contact page URL of each website, whether it has a contact form and its kind (HTML, HubSpot, Typeform, Google Forms, Jotform, WPForms, Contact Form 7, Gravity, Elementor), form fields, CAPTCHA, emails, phones and social links. $0.003 per site found.">
+<meta property="og:url" content="https://tinplatelabs.github.io/contact-page-finder/">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Contact Page & Form Finder", "description": "Contact page finder for lead lists: the contact page URL of each website, whether it has a contact form and its kind (HTML, HubSpot, Typeform, Google Forms, Jotform, WPForms, Contact Form 7, Gravity, Elementor), form fields, CAPTCHA, emails, phones and social links. $0.003 per site found.", "url": "https://tinplatelabs.github.io/contact-page-finder/", "sameAs": "https://apify.com/tinplatelabs/contact-page-finder", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Lead generation", "operatingSystem": "Web (Apify platform)", "publisher": {"@type": "Organization", "name": "Tinplate Labs", "url": "https://tinplatelabs.github.io/"}, "offers": {"@type": "Offer", "price": "0.003", "priceCurrency": "USD", "description": "per site found", "url": "https://apify.com/tinplatelabs/contact-page-finder"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does it send messages through the forms?", "acceptedAnswer": {"@type": "Answer", "text": "No. It only reads pages. What you do with the results is up to you; respect the sites' terms and anti-spam laws."}}, {"@type": "Question", "name": "Why are the fields of a HubSpot or Typeform form empty?", "acceptedAnswer": {"@type": "Answer", "text": "Embedded forms are drawn by the provider's script after the page loads. The kind, embed URL and (for HubSpot) portal and form id are reported; open the embed to see the fields."}}, {"@type": "Question", "name": "Why was a site not found?", "acceptedAnswer": {"@type": "Answer", "text": "Its links are probably drawn by JavaScript, or robots.txt forbids us. The record's notes list what was tried, and not-found sites are free."}}]}]</script>
+</head>
+<body>
+<header><a class="brand" href="/">Tinplate Labs</a><nav><a href="/#tools">Tools</a><a href="/privacy/">Privacy</a><a href="https://tinplatelabs.github.io/legal/EULA">EULA</a></nav></header>
+<main>
+<p class="meta">Lead generation · Apify Actor <code>tinplatelabs/contact-page-finder</code></p>
+<h1>Contact Page &amp; Form Finder</h1>
+<p class="lede">The contact page, its form (kind, fields, CAPTCHA), emails, phones and socials for every website in a list.</p>
+<p><a class="cta" href="https://apify.com/tinplatelabs/contact-page-finder">Open Contact Page &amp; Form Finder in the Apify Store</a></p>
+<h2>What it solves</h2>
+<p>Outreach through contact forms starts with a boring question asked thousands of times: where is this company's contact page, and does it have a form? The link is called Contact, Kontakt, Contacto or お問い合わせ, sits in the footer or behind a menu, and the form may be a WordPress plugin, a HubSpot embed or a Typeform.</p><p>Contact Page Finder takes a list of websites (or a dataset, CSV or Google Sheet) and returns, per site, the contact page URL, whether it has a contact form and which kind, the form's fields and required fields, whether it has a CAPTCHA, and the emails, phone numbers and social profiles on the contact page and home page. It never fills in or submits forms.</p>
+<ul><li>Contact page search in order: home page links scored on contact words in 20+ languages, common paths (<code>/contact</code>, <code>/contact-us</code>, <code>/kontakt</code>, <code>/contacto</code>, ...), the sitemap, a contact form on the home page.</li><li>Form kinds: plain HTML, HubSpot, Typeform, Google Forms, Jotform, WPForms, Contact Form 7, Gravity Forms, Elementor, Ninja Forms, Formidable, Fluent Forms, Divi, Marketo, Pardot, Salesforce Web-to-Lead, Webflow, Squarespace, Netlify, Formspree, Cognito, Formstack, Tally, Microsoft Forms and more.</li><li>Per form: fields (name, type, label), required fields, action, method, CAPTCHA (reCAPTCHA, hCaptcha, Turnstile, ...); HubSpot embeds give portal and form id.</li><li>Search, login and cart forms are left out; newsletter signups are marked as such.</li><li>Emails (including Cloudflare-protected ones), phone numbers and social profiles from the contact page and the home page's header and footer.</li><li>Websites from a list, an Apify dataset, or a CSV / JSON / Google Sheet URL, with the website column detected.</li><li>robots.txt obeyed with an identifying User-Agent, at most 5 pages per site by default, paced requests.</li></ul>
+<h2>Example input</h2>
+<pre><code class="language-json">{
+  &quot;websites&quot;: [
+    &quot;elementor.com&quot;,
+    &quot;www.netlify.com&quot;,
+    &quot;bakerbrothersplumbing.com&quot;
+  ]
+}</code></pre>
+<h2>Example output</h2>
+<p>One dataset item per input (abridged):</p>
+<pre><code class="language-json">// one item, abridged
+{
+  &quot;domain&quot;: &quot;elementor.com&quot;,
+  &quot;status&quot;: &quot;found&quot;,
+  &quot;contactPageUrl&quot;: &quot;https://elementor.com/contact/&quot;,
+  &quot;foundVia&quot;: &quot;homepage-link&quot;,
+  &quot;hasForm&quot;: true,
+  &quot;formKinds&quot;: [&quot;elementor&quot;],
+  &quot;captcha&quot;: true,
+  &quot;captchaKinds&quot;: [&quot;recaptcha&quot;],
+  &quot;forms&quot;: [{&quot;kind&quot;: &quot;elementor&quot;, &quot;purpose&quot;: &quot;contact&quot;, &quot;method&quot;: &quot;POST&quot;,
+             &quot;fields&quot;: [{&quot;name&quot;: &quot;form_fields[email]&quot;, &quot;type&quot;: &quot;email&quot;, &quot;label&quot;: &quot;Email&quot;, &quot;required&quot;: true}],
+             &quot;requiredFields&quot;: [&quot;form_fields[full_name]&quot;, &quot;form_fields[email]&quot;, &quot;form_fields[message]&quot;]}],
+  &quot;emails&quot;: [],
+  &quot;phones&quot;: [],
+  &quot;socialProfiles&quot;: [{&quot;network&quot;: &quot;linkedin&quot;, &quot;url&quot;: &quot;https://linkedin.com/company/elementor&quot;}]
+}</code></pre>
+<p>Anything that can't be processed becomes an error item with a code and a message that says what to change; the rest of the run carries on.</p>
+<h2>Pricing</h2>
+<p>Pay per event: you pay for results, not for compute time. Prices in USD.</p>
+<table><thead><tr><th>Event</th><th>Price</th><th>When</th></tr></thead><tbody><tr><td><code>contact-page-found</code></td><td><strong>$0.003</strong></td><td>Each website whose contact page (or a contact form on its home page) was found</td></tr><tr><td><code>apify-actor-start</code></td><td><strong>$0.001 per GB</strong></td><td>Once per run, per GB of memory: $0.001 at the default 256 MB</td></tr></tbody></table>
+<p>1,000 websites with 700 contact pages found cost about $2.10. Websites without a contact page, invalid entries, dead domains, sites that block bots and sites whose robots.txt forbids access cost nothing. When a run reaches the maximum total charge you set, it stops cleanly and marks what's left <code>SPENDING_LIMIT_REACHED</code>.</p>
+<h2>Limits</h2>
+<ul><li>10,000 websites per run; up to 15 pages per site (5 by default).</li><li>JavaScript is not executed: forms drawn only by scripts (some Wix, Squarespace and single-page sites) can be missed; the contact page is often still found.</li><li>Sites that block automated requests return a free error record.</li><li>Forms are never filled in or submitted.</li></ul>
+<h2>Use it from an AI agent</h2>
+<p>Through the <a href="https://mcp.apify.com">Apify MCP server</a>, Claude, ChatGPT, Cursor and other MCP clients can call this Actor as a tool. Add the server with this Actor enabled:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;apify&quot;: {
+      &quot;url&quot;: &quot;https://mcp.apify.com/?tools=tinplatelabs/contact-page-finder&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer &lt;APIFY_TOKEN&gt;&quot;
+      }
+    }
+  }
+}</code></pre>
+<p>The agent calls it with <code>{&quot;websites&quot;: [&quot;example.com&quot;]}</code> and reads <code>contactPageUrl</code>, <code>hasForm</code>, <code>formKinds</code> and <code>emails</code> from the dataset items.</p>
+<p>Or call the Apify API directly. This runs the Actor and returns the dataset items (synchronous runs time out after 300 s; for big batches start a run and read the dataset when it finishes):</p>
+<pre><code class="language-bash">curl -s -X POST \
+  &quot;https://api.apify.com/v2/acts/tinplatelabs~contact-page-finder/run-sync-get-dataset-items&quot; \
+  -H &quot;Authorization: Bearer $APIFY_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;websites&quot;: [&quot;example.com&quot;]}&#x27;</code></pre>
+<h2>Privacy</h2>
+<p>Only the websites you give are fetched: robots.txt, the home page, a few likely contact pages and the sitemap, plus your input file. No third party, no LLM, no telemetry. See also the <a href="/privacy/">privacy page</a>.</p>
+<h2>FAQ</h2>
+<details><summary>Does it send messages through the forms?</summary><p>No. It only reads pages. What you do with the results is up to you; respect the sites' terms and anti-spam laws.</p></details><details><summary>Why are the fields of a HubSpot or Typeform form empty?</summary><p>Embedded forms are drawn by the provider's script after the page loads. The kind, embed URL and (for HubSpot) portal and form id are reported; open the embed to see the fields.</p></details><details><summary>Why was a site not found?</summary><p>Its links are probably drawn by JavaScript, or robots.txt forbids us. The record's <code>notes</code> list what was tried, and not-found sites are free.</p></details>
+<p><a class="cta" href="https://apify.com/tinplatelabs/contact-page-finder">Try Contact Page &amp; Form Finder on Apify</a></p>
+
+</main>
+<footer><p>Tinplate Labs makes small, reliable tools for AI agents and developers. The tools are built and maintained by an AI, so there is no support desk: every error message is written to tell you exactly what to change. Billing, tax and refunds are handled by the marketplace that sells each tool.</p>
+<p><a href="/">Home</a> · <a href="/privacy/">Privacy</a> · <a href="https://tinplatelabs.github.io/legal/EULA">EULA</a> · <a href="/llms.txt">llms.txt</a> · <a href="https://apify.com/tinplatelabs">Apify Store profile</a></p></footer>
+</body>
+</html>
